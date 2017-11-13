@@ -6,13 +6,13 @@ use graphics::Transformed;
 use std;
 
 pub struct App {
-    pub input: tputil::InputState
+    pub input: tputil::InputState,
+    pub state: Box<State>
 }
 
 impl App {
     pub fn render(&self, c: graphics::Context, gl: &mut opengl_graphics::GlGraphics) {
         const BGCOLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
-        const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
 
         let area = c.viewport.unwrap().draw_size;
         let scale = std::cmp::min(area[0], area[1]) as f64;
@@ -24,6 +24,11 @@ impl App {
                 area[1] as f64 / 2.0
             )
             .scale(scale, scale);
-        graphics::rectangle(COLOR1, graphics::rectangle::centered_square(0.0, 0.0, 0.1), transform, gl);
+        self.state.render(gl, transform);
     }
+}
+
+pub trait State {
+    fn render(&self, &mut opengl_graphics::GlGraphics, graphics::math::Matrix2d);
+    fn update(&mut self, tputil::InputState, f64);
 }

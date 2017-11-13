@@ -7,11 +7,11 @@ use std;
 
 pub struct App {
     pub input: tputil::InputState,
-    pub state: Box<State>
+    pub state: Option<Box<State>>
 }
 
 impl App {
-    pub fn render(&self, c: graphics::Context, gl: &mut opengl_graphics::GlGraphics) {
+    pub fn render(&mut self, c: graphics::Context, gl: &mut opengl_graphics::GlGraphics) {
         const BGCOLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
         let area = c.viewport.unwrap().draw_size;
@@ -24,11 +24,24 @@ impl App {
                 area[1] as f64 / 2.0
             )
             .scale(scale, scale);
-        self.state.render(gl, transform);
+        let state = self.state.take().unwrap();
+        state.render(gl, transform);
+        self.state = Some(state);
+    }
+
+    pub fn update(&mut self, time: f64) {
+        self.input.update();
+        let mut state = self.state.take().unwrap();
+        state.update(self, time);
+        self.state = Some(state);
+    }
+
+    pub fn goto_state<T: State + 'static>(&mut self, new_state: T) {
+        self.state = Some(Box::new(new_state));
     }
 }
 
 pub trait State {
     fn render(&self, &mut opengl_graphics::GlGraphics, graphics::math::Matrix2d);
-    fn update(&mut self, tputil::InputState, f64);
+    fn update(&mut self, &mut App, f64);
 }

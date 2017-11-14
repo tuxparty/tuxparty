@@ -9,23 +9,24 @@ pub struct Point2D {
 }
 
 pub struct InputState {
-    gilrs: gilrs::Gilrs
+    backend: gilrs::Gilrs
 }
 
 impl InputState {
     pub fn new() -> InputState {
         return InputState {
-            gilrs: gilrs::Gilrs::new()
+            backend: gilrs::Gilrs::new()
         };
     }
 
     pub fn is_pressed(&self, id: usize, button: Button) -> bool {
-        return self.gilrs[id].is_pressed(button);
+        return self.backend[id].is_pressed(button);
     }
 
     pub fn get_pressed_any(&self, button: Button) -> Vec<usize> {
+        println!("pressed South? {}", self.backend[0].is_pressed(gilrs::Button::South));
         let mut results = Vec::new();
-        for (_id, gamepad) in self.gilrs.gamepads() {
+        for (_id, gamepad) in self.backend.gamepads() {
             println!("gamepad {} button {:?} status {:?}", _id, button, gamepad.status());
             if gamepad.is_pressed(button) {
                 println!("is pressed");
@@ -37,8 +38,8 @@ impl InputState {
     }
 
     pub fn update(&mut self) {
-        while let Some(gilrs::Event { id, event, time }) = self.gilrs.next_event() {
-            println!("event: {} {:?} {:?}", id, event, time);
+        while let Some(event) = self.backend.next_event() {
+            self.backend.update(&event);
         }
     }
 }

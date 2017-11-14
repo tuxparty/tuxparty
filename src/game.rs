@@ -33,7 +33,9 @@ impl App {
         self.input.update();
         let mut state = self.state.take().unwrap();
         state.update(self, time);
-        self.state = Some(state);
+        if self.state.is_none() {
+            self.state = Some(state);
+        }
     }
 
     pub fn goto_state<T: State + 'static>(&mut self, new_state: T) {

@@ -19,6 +19,10 @@ impl InputState {
         };
     }
 
+    pub fn get_axis(&self, id: usize, axis: Axis) -> f32 {
+        return self.backend[id].value(axis);
+    }
+
     pub fn is_pressed(&self, id: usize, button: Button) -> bool {
         return self.backend[id].is_pressed(button);
     }

@@ -65,7 +65,7 @@ struct JoinState {
 impl JoinState {
     fn new(player: usize) -> JoinState {
         let mut tr = JoinState {
-            players: Vec::new()
+            players: Vec::new(),
         };
         tr.players.push(player);
         return tr;
@@ -74,14 +74,16 @@ impl JoinState {
 
 impl game::State for JoinState {
     fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
+        const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         const COLOR2: [f32; 4] = [0.0, 1.0, 1.0, 1.0];
         let count = self.players.len();
         let scale = 2.0 / (count + 1) as f64;
+        graphics::rectangle(COLOR1, graphics::rectangle::centered_square(0.0, 0.0, 1.0), trans, gl);
         for i in 0..count {
             graphics::rectangle(
                 COLOR2,
                 graphics::rectangle::centered_square(
-                    scale * (i + 1) as f64 - 1.0,
+                    scale * (i as f64 + 1.0) - 1.0,
                     0.0,
                     scale / 4.0,
                 ),
@@ -90,5 +92,13 @@ impl game::State for JoinState {
             );
         }
     }
-    fn update(&mut self, app: &mut game::App, time: f64) {}
+    fn update(&mut self, app: &mut game::App, time: f64) {
+        let joining = app.input.get_pressed_any(tputil::Button::South);
+        for p in joining {
+            if self.players.contains(&p) {
+                continue;
+            }
+            self.players.push(p);
+        }
+    }
 }

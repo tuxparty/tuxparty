@@ -3,6 +3,16 @@ use gilrs;
 pub use gilrs::Axis;
 pub use gilrs::Button;
 
+
+pub const COLORS: [[f32; 4]; 6] = [
+    [1.0, 0.0, 0.0, 1.0],
+    [0.0, 1.0, 0.0, 1.0],
+    [0.0, 0.0, 1.0, 1.0],
+    [1.0, 1.0, 0.0, 1.0],
+    [1.0, 0.0, 1.0, 1.0],
+    [0.0, 1.0, 1.0, 1.0],
+];
+
 pub struct Point2D {
     x: f64,
     y: f64,

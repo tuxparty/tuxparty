@@ -24,12 +24,9 @@ impl InputState {
     }
 
     pub fn get_pressed_any(&self, button: Button) -> Vec<usize> {
-        println!("pressed South? {}", self.backend[0].is_pressed(gilrs::Button::South));
         let mut results = Vec::new();
         for (_id, gamepad) in self.backend.gamepads() {
-            println!("gamepad {} button {:?} status {:?}", _id, button, gamepad.status());
             if gamepad.is_pressed(button) {
-                println!("is pressed");
                 results.push(_id);
             }
         }

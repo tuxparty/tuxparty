@@ -15,7 +15,6 @@ impl App {
         const BGCOLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
         let area = c.viewport.unwrap().draw_size;
-        println!("{:?}", area);
         let scale = std::cmp::min(area[0], area[1]) as f64 / 2.0;
 
         graphics::clear(BGCOLOR, gl);

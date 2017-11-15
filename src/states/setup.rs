@@ -28,13 +28,13 @@ impl game::State for MenuState {
 }
 
 struct JoinStatePlayer {
-    id: usize,
+    id: tputil::InputMethod,
     rotation: f64,
     color: usize,
 }
 
 impl JoinStatePlayer {
-    fn new(player: usize, color: usize) -> JoinStatePlayer {
+    fn new(player: tputil::InputMethod, color: usize) -> JoinStatePlayer {
         return JoinStatePlayer {
             id: player,
             rotation: 0.0,
@@ -105,13 +105,13 @@ impl game::State for JoinState {
             self.players.push(JoinStatePlayer::new(p, color));
         }
         for player in &mut self.players {
-            let movement = app.input.get_axis(player.id, tputil::Axis::LeftStickX);
+            let movement = app.input.get_axis(&player.id, tputil::Axis::LeftStickX);
             player.rotation += movement as f64 * time * 3.0;
         }
 
         self.players.retain(|p| {
-            !app.input.is_pressed(p.id, tputil::Button::East)
-                || app.input.is_pressed(p.id, tputil::Button::South)
+            !app.input.is_pressed(&p.id, tputil::Button::East)
+                || app.input.is_pressed(&p.id, tputil::Button::South)
         });
     }
 }

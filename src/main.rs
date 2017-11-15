@@ -9,7 +9,7 @@ extern crate rand;
 extern crate sdl2_window;
 
 use sdl2_window::Sdl2Window as Window;
-use piston::input::{RenderEvent, UpdateEvent};
+use piston::input::{RenderEvent, UpdateEvent, PressEvent, ReleaseEvent};
 
 fn main() {
     let gl_version = opengl_graphics::OpenGL::V3_2;
@@ -36,6 +36,12 @@ fn main() {
         }
         if let Some(u) = e.update_args() {
             app.update(u.dt);
+        }
+        if let Some(piston::input::Button::Keyboard(key)) = e.press_args() {
+            app.input.on_key_press(key);
+        }
+        if let Some(piston::input::Button::Keyboard(key)) = e.release_args() {
+            app.input.on_key_release(key);
         }
     }
 }

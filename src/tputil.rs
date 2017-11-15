@@ -5,21 +5,24 @@ pub use gilrs::Button;
 
 pub struct Point2D {
     x: f64,
-    y: f64
+    y: f64,
 }
 
 pub struct InputState {
-    backend: gilrs::Gilrs
+    backend: gilrs::Gilrs,
 }
 
 impl InputState {
     pub fn new() -> InputState {
         return InputState {
-            backend: gilrs::Gilrs::new()
+            backend: gilrs::Gilrs::new(),
         };
     }
 
     pub fn get_axis(&self, id: usize, axis: Axis) -> f32 {
+        if self.backend[id].status() == gilrs::Status::Disconnected {
+            return 0.0;
+        }
         return self.backend[id].value(axis);
     }
 

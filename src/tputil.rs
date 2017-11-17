@@ -1,8 +1,11 @@
 use std;
 use gilrs;
 use piston;
+use graphics;
 pub use gilrs::Axis;
 pub use gilrs::Button;
+
+use graphics::Transformed;
 
 pub const COLORS: [[f32; 4]; 6] = [
     [1.0, 0.0, 0.0, 1.0],
@@ -14,17 +17,43 @@ pub const COLORS: [[f32; 4]; 6] = [
 ];
 
 pub struct Point2D {
-    x: f64,
-    y: f64,
+    pub x: f64,
+    pub y: f64,
 }
 
-#[derive(PartialEq, Eq)]
+impl std::ops::Neg for Point2D {
+    type Output = Point2D;
+    fn neg(self) -> Point2D {
+        return Point2D {
+            x: -self.x,
+            y: -self.y
+        };
+    }
+}
+
+impl Point2D {
+    pub fn translate(&self, transform: graphics::math::Matrix2d) -> graphics::math::Matrix2d {
+        return transform.trans(self.x, self.y);
+    }
+    pub fn new(x: f64, y: f64) -> Point2D {
+        return Point2D {
+            x: x,
+            y: y
+        };
+    }
+    pub const ZERO: Point2D = Point2D {
+        x: 0.0,
+        y: 0.0
+    };
+}
+
+#[derive(PartialEq, Eq, Copy, Clone)]
 pub enum InputType {
     Gamepad,
     Keyboard,
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Copy, Clone)]
 pub struct InputMethod {
     input_type: InputType,
     id: usize,
@@ -86,6 +115,7 @@ impl InputState {
             InputType::Keyboard => {
                 let key = match button {
                     Button::South => Some(piston::input::Key::LShift),
+                    Button::Start => Some(piston::input::Key::Return),
                     _ => None
                 };
                 match key {

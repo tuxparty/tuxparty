@@ -1,6 +1,7 @@
 mod game;
 mod tputil;
 mod states;
+mod board;
 extern crate gilrs;
 extern crate graphics;
 extern crate opengl_graphics;

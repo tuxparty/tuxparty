@@ -50,7 +50,7 @@ impl From<JoinStatePlayer> for states::ingame::PlayerInfo {
     fn from(player: JoinStatePlayer) -> states::ingame::PlayerInfo {
         return states::ingame::PlayerInfo {
             input: player.id,
-            color: player.color
+            color: player.color,
         };
     }
 }
@@ -127,11 +127,13 @@ impl game::State for JoinState {
         });
 
         if app.input.get_pressed_any(tputil::Button::Start).len() > 0 {
-            let players: Vec<states::ingame::PlayerInfo> = self.players.iter().map(|player|states::ingame::PlayerInfo::from((*player).clone())).collect();
-            app.goto_state(states::ingame::BoardMoveState::new(states::ingame::GameInfo::new(
-                players,
-                board::Board::get_default_board()
-            )));
+            let players: Vec<states::ingame::PlayerInfo> = self.players
+                .iter()
+                .map(|player| states::ingame::PlayerInfo::from((*player).clone()))
+                .collect();
+            let board = board::Board::get_default_board();
+            let game = states::ingame::GameInfo::new(players, board);
+            app.goto_state(states::ingame::BoardMoveState::new_start(game));
         }
     }
 }

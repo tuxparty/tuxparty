@@ -16,6 +16,7 @@ pub const COLORS: [[f32; 4]; 6] = [
     [0.0, 1.0, 1.0, 1.0],
 ];
 
+#[derive(Copy, Clone)]
 pub struct Point2D {
     pub x: f64,
     pub y: f64,
@@ -39,6 +40,12 @@ impl Point2D {
         return Point2D {
             x: x,
             y: y
+        };
+    }
+    pub fn lerp(a: Point2D, b: Point2D, t: f64) -> Point2D {
+        return Point2D {
+            x: (b.x-a.x)*t+a.x,
+            y: (b.y-a.y)*t+a.y
         };
     }
     pub const ZERO: Point2D = Point2D {

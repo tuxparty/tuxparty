@@ -13,8 +13,8 @@ pub struct PlayerInfo {
 }
 
 pub struct GameInfo {
-    players: Vec<PlayerInfo>,
-    map: board::Board
+    pub players: Vec<PlayerInfo>,
+    pub map: board::Board
 }
 
 impl GameInfo {
@@ -26,13 +26,14 @@ impl GameInfo {
         };
     }
 
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, center: tputil::Point2D, scale: f64) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, center: tputil::Point2D, scale: f64) -> graphics::math::Matrix2d {
         const COLOR1: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
         let transform = (-center).translate(trans).scale(scale, scale);
-        for space in self.map.spaces.into_iter() {
+        for space in &self.map.spaces {
             graphics::rectangle(COLOR1, graphics::rectangle::centered_square(space.pos.x, space.pos.y, 1.0), transform, gl);
         }
+        return transform;
     }
 }
 
@@ -41,22 +42,42 @@ struct IngameState {
 }
 
 pub struct BoardMoveState {
-    game: GameInfo
+    game: GameInfo,
+    time: f64,
+    start_space: board::SpaceID,
+    transition: usize,
+    duration: f64
 }
 
 impl BoardMoveState {
-    pub fn new(info: GameInfo) -> BoardMoveState {
+    pub fn new(info: GameInfo, start: board::SpaceID, transition: usize) -> BoardMoveState {
         return BoardMoveState {
-            game: info
+            game: info,
+            time: 0.0,
+            start_space: start,
+            transition: transition,
+            duration: 1.0
         };
+    }
+    pub fn new_start(info: GameInfo) -> BoardMoveState {
+        let space = info.map.spaces[0].id;
+        return BoardMoveState::new(info, space, 0);
     }
 }
 
 impl game::State for BoardMoveState {
     fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
-        self.game.render(gl, trans, tputil::Point2D::ZERO, 0.2);
+        let transform = self.game.render(gl, trans, tputil::Point2D::ZERO, 0.2);
+        let start = self.game.map.get_space(self.start_space).unwrap();
+        let transition = &start.transitions[self.transition];
+        let end = self.game.map.get_space(transition.to).unwrap();
+
+        let pos = tputil::Point2D::lerp(start.pos, end.pos, self.time / self.duration);
+        const COLOR2: [f32; 4] = [0.0, 0.0, 1.0, 1.0];
+        graphics::rectangle(COLOR2, graphics::rectangle::centered_square(pos.x, pos.y, 1.0), transform, gl);
     }
     fn update(&mut self, app: &mut game::App, time: f64) {
-
+        self.time += time;
+        
     }
 }

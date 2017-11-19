@@ -11,7 +11,7 @@ use graphics::Transformed;
 pub struct PlayerInfo {
     pub input: tputil::InputMethod,
     pub color: usize,
-    pub space: board::SpaceID
+    pub space: board::SpaceID,
 }
 
 #[derive(Clone)]
@@ -63,7 +63,7 @@ pub struct BoardMoveState {
     transition: usize,
     duration: f64,
     turn: usize,
-    remaining: u8
+    remaining: u8,
 }
 
 impl BoardMoveState {
@@ -74,7 +74,7 @@ impl BoardMoveState {
             transition: transition,
             duration: 1.0,
             turn: turn,
-            remaining: remaining
+            remaining: remaining,
         };
     }
     pub fn new_start(info: GameInfo) -> BoardMoveState {
@@ -85,7 +85,10 @@ impl BoardMoveState {
 impl game::State for BoardMoveState {
     fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
         let transform = self.game.render(gl, trans, tputil::Point2D::ZERO, 0.2);
-        let start = self.game.map.get_space(self.game.players[self.turn].space).unwrap();
+        let start = self.game
+            .map
+            .get_space(self.game.players[self.turn].space)
+            .unwrap();
         let transition = &start.transitions[self.transition];
         let end = self.game.map.get_space(transition.to).unwrap();
 
@@ -101,17 +104,29 @@ impl game::State for BoardMoveState {
     fn update(&mut self, app: &mut game::App, time: f64) {
         self.time += time;
         if self.time > self.duration {
-            let start = self.game.map.get_space(self.game.players[self.turn].space).unwrap();
+            let start = self.game
+                .map
+                .get_space(self.game.players[self.turn].space)
+                .unwrap();
             let transition = &start.transitions[self.transition];
 
             let mut new_game_state = self.game.clone();
             new_game_state.players[self.turn].space = transition.to;
 
             if self.remaining > 1 {
-                app.goto_state(BoardMoveState::new(new_game_state, 0, self.turn, self.remaining-1));
-            }
-            else {
-                app.goto_state(BoardMoveState::new(new_game_state, 0, (self.turn+1)%self.game.players.len(), 4));
+                app.goto_state(BoardMoveState::new(
+                    new_game_state,
+                    0,
+                    self.turn,
+                    self.remaining - 1,
+                ));
+            } else {
+                app.goto_state(BoardMoveState::new(
+                    new_game_state,
+                    0,
+                    (self.turn + 1) % self.game.players.len(),
+                    4,
+                ));
             }
         }
     }

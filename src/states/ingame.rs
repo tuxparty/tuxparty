@@ -7,38 +7,53 @@ use opengl_graphics;
 
 use graphics::Transformed;
 
+#[derive(Clone, Copy)]
 pub struct PlayerInfo {
     pub input: tputil::InputMethod,
-    pub color: usize
+    pub color: usize,
 }
 
+#[derive(Clone)]
 pub struct GameInfo {
     pub players: Vec<PlayerInfo>,
-    pub map: board::Board
+    pub map: board::Board,
 }
 
 impl GameInfo {
     pub fn new<I>(players: I, map: board::Board) -> GameInfo
-     where I: IntoIterator<Item = PlayerInfo> {
+    where
+        I: IntoIterator<Item = PlayerInfo>,
+    {
         return GameInfo {
             players: players.into_iter().collect(),
-            map: map
+            map: map,
         };
     }
 
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, center: tputil::Point2D, scale: f64) -> graphics::math::Matrix2d {
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        center: tputil::Point2D,
+        scale: f64,
+    ) -> graphics::math::Matrix2d {
         const COLOR1: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
         let transform = (-center).translate(trans).scale(scale, scale);
         for space in &self.map.spaces {
-            graphics::rectangle(COLOR1, graphics::rectangle::centered_square(space.pos.x, space.pos.y, 1.0), transform, gl);
+            graphics::rectangle(
+                COLOR1,
+                graphics::rectangle::centered_square(space.pos.x, space.pos.y, 1.0),
+                transform,
+                gl,
+            );
         }
         return transform;
     }
 }
 
 struct IngameState {
-    game: GameInfo
+    game: GameInfo,
 }
 
 pub struct BoardMoveState {
@@ -46,7 +61,7 @@ pub struct BoardMoveState {
     time: f64,
     start_space: board::SpaceID,
     transition: usize,
-    duration: f64
+    duration: f64,
 }
 
 impl BoardMoveState {
@@ -56,7 +71,7 @@ impl BoardMoveState {
             time: 0.0,
             start_space: start,
             transition: transition,
-            duration: 1.0
+            duration: 1.0,
         };
     }
     pub fn new_start(info: GameInfo) -> BoardMoveState {
@@ -74,10 +89,21 @@ impl game::State for BoardMoveState {
 
         let pos = tputil::Point2D::lerp(start.pos, end.pos, self.time / self.duration);
         const COLOR2: [f32; 4] = [0.0, 0.0, 1.0, 1.0];
-        graphics::rectangle(COLOR2, graphics::rectangle::centered_square(pos.x, pos.y, 1.0), transform, gl);
+        graphics::rectangle(
+            COLOR2,
+            graphics::rectangle::centered_square(pos.x, pos.y, 1.0),
+            transform,
+            gl,
+        );
     }
     fn update(&mut self, app: &mut game::App, time: f64) {
         self.time += time;
-        
+        if self.time > self.duration {
+            let start = self.game.map.get_space(self.start_space).unwrap();
+            let transition = &start.transitions[self.transition];
+            let end = self.game.map.get_space(transition.to).unwrap();
+
+            app.goto_state(BoardMoveState::new(self.game.clone(), end.id, 0));
+        }
     }
 }

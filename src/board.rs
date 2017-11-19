@@ -2,16 +2,19 @@ use tputil;
 
 pub type SpaceID = usize;
 
+#[derive(Clone)]
 pub struct Space {
     pub id: SpaceID,
     pub transitions: Box<[SpaceTransition]>,
     pub pos: tputil::Point2D
 }
 
+#[derive(Copy, Clone)]
 pub struct SpaceTransition {
     pub to: SpaceID,
 }
 
+#[derive(Clone)]
 pub struct Board {
     pub spaces: Vec<Space>
 }

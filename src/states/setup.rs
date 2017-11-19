@@ -51,6 +51,7 @@ impl From<JoinStatePlayer> for states::ingame::PlayerInfo {
         return states::ingame::PlayerInfo {
             input: player.id,
             color: player.color,
+            space: 0
         };
     }
 }

@@ -24,7 +24,7 @@ impl Board {
         return Board {
             spaces: vec![
                 Space {
-                    id: 54,
+                    id: 0,
                     transitions: Box::new([SpaceTransition { to: 32 }]),
                     pos: tputil::Point2D::new(0.0, 0.0)
                 },
@@ -35,7 +35,7 @@ impl Board {
                 },
                 Space {
                     id: 66,
-                    transitions: Box::new([SpaceTransition { to: 54 }]),
+                    transitions: Box::new([SpaceTransition { to: 0 }]),
                     pos: tputil::Point2D::new(-1.2, 1.2)
                 }
             ]

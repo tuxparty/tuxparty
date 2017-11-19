@@ -30,9 +30,14 @@ impl Board {
                 },
                 Space {
                     id: 32,
-                    transitions: Box::new([SpaceTransition { to: 54 }]),
+                    transitions: Box::new([SpaceTransition { to: 66 }]),
                     pos: tputil::Point2D::new(2.0, 0.7)
                 },
+                Space {
+                    id: 66,
+                    transitions: Box::new([SpaceTransition { to: 54 }]),
+                    pos: tputil::Point2D::new(-1.2, 1.2)
+                }
             ]
         };
     }

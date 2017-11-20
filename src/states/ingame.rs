@@ -53,10 +53,6 @@ impl GameInfo {
     }
 }
 
-struct IngameState {
-    game: GameInfo,
-}
-
 pub struct BoardMoveState {
     game: GameInfo,
     time: f64,

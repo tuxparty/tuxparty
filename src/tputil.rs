@@ -27,7 +27,7 @@ impl std::ops::Neg for Point2D {
     fn neg(self) -> Point2D {
         return Point2D {
             x: -self.x,
-            y: -self.y
+            y: -self.y,
         };
     }
 }
@@ -37,21 +37,18 @@ impl Point2D {
         return transform.trans(self.x, self.y);
     }
     pub fn new(x: f64, y: f64) -> Point2D {
-        return Point2D {
-            x: x,
-            y: y
-        };
+        return Point2D { x: x, y: y };
     }
     pub fn lerp(a: Point2D, b: Point2D, t: f64) -> Point2D {
         return Point2D {
-            x: (b.x-a.x)*t+a.x,
-            y: (b.y-a.y)*t+a.y
+            x: (b.x - a.x) * t + a.x,
+            y: (b.y - a.y) * t + a.y,
         };
     }
-    pub const ZERO: Point2D = Point2D {
-        x: 0.0,
-        y: 0.0
-    };
+    pub fn dist(a: Point2D, b: Point2D) -> f64 {
+        return ((b.x - a.x).powf(2.0) + (b.y - a.y).powf(2.0)).sqrt();
+    }
+    pub const ZERO: Point2D = Point2D { x: 0.0, y: 0.0 };
 }
 
 #[derive(PartialEq, Eq, Copy, Clone)]
@@ -68,7 +65,7 @@ pub struct InputMethod {
 
 const KEYBOARD: InputMethod = InputMethod {
     input_type: InputType::Keyboard,
-    id: 0
+    id: 0,
 };
 
 pub struct InputState {
@@ -96,22 +93,24 @@ impl InputState {
                 Axis::LeftStickX => {
                     return (match self.keyboard_state.get(&piston::input::Key::Left) {
                         Some(_) => -1.0,
-                        _ => 0.0
-                    }) + match self.keyboard_state.get(&piston::input::Key::Right) {
-                        Some(_) => 1.0,
-                        _ => 0.0
-                    }
-                },
+                        _ => 0.0,
+                    })
+                        + match self.keyboard_state.get(&piston::input::Key::Right) {
+                            Some(_) => 1.0,
+                            _ => 0.0,
+                        }
+                }
                 Axis::LeftStickY => {
                     return (match self.keyboard_state.get(&piston::input::Key::Up) {
                         Some(_) => -1.0,
-                        _ => 0.0
-                    }) + match self.keyboard_state.get(&piston::input::Key::Down) {
-                        Some(_) => 1.0,
-                        _ => 0.0
-                    }
+                        _ => 0.0,
+                    })
+                        + match self.keyboard_state.get(&piston::input::Key::Down) {
+                            Some(_) => 1.0,
+                            _ => 0.0,
+                        }
                 }
-                _ => 0.0
+                _ => 0.0,
             },
         }
     }
@@ -123,11 +122,11 @@ impl InputState {
                 let key = match button {
                     Button::South => Some(piston::input::Key::LShift),
                     Button::Start => Some(piston::input::Key::Return),
-                    _ => None
+                    _ => None,
                 };
                 match key {
                     Some(key) => self.keyboard_state.contains_key(&key),
-                    None => false
+                    None => false,
                 }
             }
         }
@@ -139,7 +138,7 @@ impl InputState {
             if gamepad.is_pressed(button) {
                 results.push(InputMethod {
                     id: _id,
-                    input_type: InputType::Gamepad
+                    input_type: InputType::Gamepad,
                 });
             }
         }

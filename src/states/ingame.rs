@@ -68,11 +68,17 @@ pub struct BoardMoveState {
 
 impl BoardMoveState {
     pub fn new(info: GameInfo, transition: usize, turn: usize, remaining: u8) -> BoardMoveState {
+        let duration;
+        {
+            let start_space = info.map.get_space(info.players[turn].space).unwrap();
+            let end_space = info.map.get_space(start_space.transitions[transition].to).unwrap();
+            duration = tputil::Point2D::dist(start_space.pos, end_space.pos) / 3.0;
+        };
         return BoardMoveState {
             game: info,
             time: 0.0,
             transition: transition,
-            duration: 1.0,
+            duration: duration,
             turn: turn,
             remaining: remaining,
         };
@@ -124,7 +130,7 @@ impl game::State for BoardMoveState {
                 app.goto_state(SpaceResultState {
                     game: new_game_state,
                     time: 0.0,
-                    turn: self.turn
+                    turn: self.turn,
                 });
             }
         }
@@ -134,7 +140,7 @@ impl game::State for BoardMoveState {
 struct SpaceResultState {
     game: GameInfo,
     time: f64,
-    turn: usize
+    turn: usize,
 }
 
 impl game::State for SpaceResultState {

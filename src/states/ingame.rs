@@ -121,13 +121,44 @@ impl game::State for BoardMoveState {
                     self.remaining - 1,
                 ));
             } else {
-                app.goto_state(BoardMoveState::new(
-                    new_game_state,
-                    0,
-                    (self.turn + 1) % self.game.players.len(),
-                    4,
-                ));
+                app.goto_state(SpaceResultState {
+                    game: new_game_state,
+                    time: 0.0,
+                    turn: self.turn
+                });
             }
+        }
+    }
+}
+
+struct SpaceResultState {
+    game: GameInfo,
+    time: f64,
+    turn: usize
+}
+
+impl game::State for SpaceResultState {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
+        let transform = self.game.render(gl, trans, tputil::Point2D::ZERO, 0.2);
+        let player = self.game.players[self.turn];
+        let color = tputil::COLORS[player.color];
+        let space = self.game.map.get_space(player.space).unwrap();
+        graphics::rectangle(
+            color,
+            graphics::rectangle::centered_square(space.pos.x, space.pos.y, 1.0),
+            transform,
+            gl,
+        );
+    }
+    fn update(&mut self, app: &mut game::App, time: f64) {
+        self.time += time;
+        if self.time > 1.0 {
+            app.goto_state(BoardMoveState::new(
+                self.game.clone(),
+                0,
+                (self.turn + 1) % self.game.players.len(),
+                4,
+            ));
         }
     }
 }

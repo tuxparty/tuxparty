@@ -1,6 +1,7 @@
 use game;
 use tputil;
 use board;
+use states;
 
 use graphics;
 use opengl_graphics;
@@ -9,8 +10,7 @@ use graphics::Transformed;
 
 #[derive(Clone, Copy)]
 pub struct PlayerInfo {
-    pub input: tputil::InputMethod,
-    pub color: usize,
+    pub player: tputil::Player,
     pub space: board::SpaceID,
 }
 
@@ -67,7 +67,9 @@ impl BoardMoveState {
         let duration;
         {
             let start_space = info.map.get_space(info.players[turn].space).unwrap();
-            let end_space = info.map.get_space(start_space.transitions[transition].to).unwrap();
+            let end_space = info.map
+                .get_space(start_space.transitions[transition].to)
+                .unwrap();
             duration = tputil::Point2D::dist(start_space.pos, end_space.pos) / 3.0;
         };
         return BoardMoveState {
@@ -95,7 +97,7 @@ impl game::State for BoardMoveState {
         let end = self.game.map.get_space(transition.to).unwrap();
 
         let pos = tputil::Point2D::lerp(start.pos, end.pos, self.time / self.duration);
-        let color = tputil::COLORS[self.game.players[self.turn].color];
+        let color = tputil::COLORS[self.game.players[self.turn].player.color];
         graphics::rectangle(
             color,
             graphics::rectangle::centered_square(pos.x, pos.y, 1.0),
@@ -143,7 +145,7 @@ impl game::State for SpaceResultState {
     fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
         let transform = self.game.render(gl, trans, tputil::Point2D::ZERO, 0.2);
         let player = self.game.players[self.turn];
-        let color = tputil::COLORS[player.color];
+        let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();
         graphics::rectangle(
             color,
@@ -155,12 +157,11 @@ impl game::State for SpaceResultState {
     fn update(&mut self, app: &mut game::App, time: f64) {
         self.time += time;
         if self.time > 1.0 {
-            app.goto_state(BoardMoveState::new(
-                self.game.clone(),
-                0,
-                (self.turn + 1) % self.game.players.len(),
-                4,
-            ));
+            if self.turn + 1 < self.game.players.len() {
+                app.goto_state(BoardMoveState::new(self.game.clone(), 0, self.turn + 1, 4));
+            } else {
+                app.goto_state(states::minigame::MinigameState::new(self.game.clone()));
+            }
         }
     }
 }

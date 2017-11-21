@@ -31,17 +31,18 @@ impl game::State for MenuState {
 
 #[derive(Copy, Clone)]
 struct JoinStatePlayer {
-    id: tputil::InputMethod,
+    player: tputil::Player,
     rotation: f64,
-    color: usize,
 }
 
 impl JoinStatePlayer {
     fn new(player: tputil::InputMethod, color: usize) -> JoinStatePlayer {
         return JoinStatePlayer {
-            id: player,
             rotation: 0.0,
-            color: color,
+            player: tputil::Player {
+                input: player,
+                color: color
+            }
         };
     }
 }
@@ -49,8 +50,7 @@ impl JoinStatePlayer {
 impl From<JoinStatePlayer> for states::ingame::PlayerInfo {
     fn from(player: JoinStatePlayer) -> states::ingame::PlayerInfo {
         return states::ingame::PlayerInfo {
-            input: player.id,
-            color: player.color,
+            player: player.player,
             space: 0
         };
     }
@@ -84,7 +84,7 @@ impl game::State for JoinState {
                 .trans(scale * (i as f64 + 1.0) - 1.0, 0.0)
                 .rot_rad(self.players[i].rotation);
             graphics::rectangle(
-                tputil::COLORS[self.players[i].color],
+                tputil::COLORS[self.players[i].player.color],
                 graphics::rectangle::centered_square(0.0, 0.0, scale / 4.0),
                 transform,
                 gl,
@@ -99,7 +99,7 @@ impl game::State for JoinState {
             }
             let mut found = false;
             for player in &self.players {
-                if player.id == p {
+                if player.player.input == p {
                     found = true;
                     break;
                 }
@@ -110,7 +110,7 @@ impl game::State for JoinState {
             let color;
             let mut colors: Vec<usize> = (0..tputil::COLORS.len()).collect();
             for player in &self.players {
-                if let Some(pos) = (&colors).into_iter().position(|&c| c == player.color) {
+                if let Some(pos) = (&colors).into_iter().position(|&c| c == player.player.color) {
                     colors.remove(pos);
                 }
             }
@@ -118,13 +118,13 @@ impl game::State for JoinState {
             self.players.push(JoinStatePlayer::new(p, color));
         }
         for player in &mut self.players {
-            let movement = app.input.get_axis(&player.id, tputil::Axis::LeftStickX);
+            let movement = app.input.get_axis(&player.player.input, tputil::Axis::LeftStickX);
             player.rotation += movement as f64 * time * 3.0;
         }
 
         self.players.retain(|p| {
-            !app.input.is_pressed(&p.id, tputil::Button::East)
-                || app.input.is_pressed(&p.id, tputil::Button::South)
+            !app.input.is_pressed(&p.player.input, tputil::Button::East)
+                || app.input.is_pressed(&p.player.input, tputil::Button::South)
         });
 
         if app.input.get_pressed_any(tputil::Button::Start).len() > 0 {

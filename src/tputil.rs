@@ -68,6 +68,12 @@ const KEYBOARD: InputMethod = InputMethod {
     id: 0,
 };
 
+#[derive(Clone, Copy)]
+pub struct Player {
+    pub input: InputMethod,
+    pub color: usize
+}
+
 pub struct InputState {
     backend: gilrs::Gilrs,
     keyboard_state: std::collections::HashMap<piston::input::Key, bool>,

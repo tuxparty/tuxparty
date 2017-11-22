@@ -138,6 +138,10 @@ impl InputState {
         }
     }
 
+    pub fn is_key_pressed(&self, key: &piston::input::keyboard::Key) -> bool {
+        return self.keyboard_state.contains_key(key);
+    }
+
     pub fn get_pressed_any(&self, button: Button) -> Vec<InputMethod> {
         let mut results = Vec::new();
         for (_id, gamepad) in self.backend.gamepads() {

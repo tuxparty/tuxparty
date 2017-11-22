@@ -4,8 +4,10 @@ use graphics;
 use rand;
 use tputil;
 use states;
+use std;
 
 use rand::Rng;
+use graphics::Transformed;
 
 pub struct MinigameState {
     minigame: Box<Minigame>,
@@ -66,7 +68,17 @@ impl MGQuickdraw {
 
 impl Minigame for MGQuickdraw {
     fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
-
+        let count = self.players.len();
+        let scale = 2.0 / (count + 1) as f64;
+        for i in 0..count {
+            let mut x = i as f64;
+            x -= count as f64 / 2.0;
+            let size = (x as f64 * scale * std::f64::consts::PI / 2.0).cos();
+            let transform = trans
+            .trans(x as f64 * scale, size)
+            .scale(size, size);
+            graphics::rectangle(tputil::COLORS[self.players[i].color], graphics::rectangle::square(0.0, -1.0, 0.5), transform, gl);
+        }
     }
     fn update(&mut self, app: &game::App, time: f64) -> Option<usize> {
         self.time += time;

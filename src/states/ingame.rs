@@ -82,7 +82,7 @@ impl BoardMoveState {
         };
     }
     pub fn new_start(info: GameInfo) -> BoardMoveState {
-        return BoardMoveState::new(info, 0, 0, 8);
+        return BoardMoveState::new(info, 0, 0, 4);
     }
 }
 
@@ -158,7 +158,7 @@ impl game::State for SpaceResultState {
         self.time += time;
         if self.time > 1.0 {
             if self.turn + 1 < self.game.players.len() {
-                app.goto_state(BoardMoveState::new(self.game.clone(), 0, self.turn + 1, 4));
+                app.goto_state(BoardMoveState::new(self.game.clone(), 0, self.turn + 1, 3));
             } else {
                 app.goto_state(states::minigame::MinigameState::new(self.game.clone()));
             }

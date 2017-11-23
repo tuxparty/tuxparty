@@ -1,7 +1,7 @@
 pipeline {
 	agent {
 		docker {
-			image 'rust:1.21-jessie'
+			image 'rust-input-docker'
 			args '--cpus=0.8'
 		}
 	}

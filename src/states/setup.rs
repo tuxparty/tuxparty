@@ -12,7 +12,7 @@ use rand::Rng;
 pub struct MenuState {}
 
 impl game::State for MenuState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _: &game::App) {
         const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         graphics::rectangle(
             COLOR1,
@@ -51,7 +51,8 @@ impl From<JoinStatePlayer> for states::ingame::PlayerInfo {
     fn from(player: JoinStatePlayer) -> states::ingame::PlayerInfo {
         return states::ingame::PlayerInfo {
             player: player.player,
-            space: 0
+            space: 0,
+            coins: 0
         };
     }
 }
@@ -69,7 +70,7 @@ impl JoinState {
 }
 
 impl game::State for JoinState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _: &game::App) {
         const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         let count = self.players.len();
         let scale = 2.0 / (count + 1) as f64;

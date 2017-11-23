@@ -15,7 +15,7 @@ pub struct MinigameState {
 }
 
 impl game::State for MinigameState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _: &game::App) {
         self.minigame.render(gl, trans);
     }
     fn update(&mut self, app: &mut game::App, time: f64) {

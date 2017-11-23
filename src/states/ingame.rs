@@ -12,6 +12,7 @@ use graphics::Transformed;
 pub struct PlayerInfo {
     pub player: tputil::Player,
     pub space: board::SpaceID,
+    pub coins: u32
 }
 
 #[derive(Clone)]
@@ -37,6 +38,7 @@ impl GameInfo {
         trans: graphics::math::Matrix2d,
         center: tputil::Point2D,
         scale: f64,
+        number_renderer: &game::NumberRenderer
     ) -> graphics::math::Matrix2d {
         const COLOR1: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
@@ -48,6 +50,20 @@ impl GameInfo {
                 transform,
                 gl,
             );
+        }
+        for i in 0..self.players.len().min(4) {
+            let coins = format!("{}", self.players[i].coins);
+            let size = 0.4;
+            let mut x = -1.0;
+            let mut y = -1.0;
+            if i == 1 || i == 3 {
+                x = 1.0 - number_renderer.get_str_width(&coins, size);
+            }
+            if i == 2 || i == 3 {
+                y = 1.0 - size;
+            }
+            println!("printing {} at {},{}", coins, x, y);
+            number_renderer.draw_str(&coins, size, trans.trans(x, y), gl);
         }
         return transform;
     }
@@ -87,8 +103,8 @@ impl BoardMoveState {
 }
 
 impl game::State for BoardMoveState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
-        let transform = self.game.render(gl, trans, tputil::Point2D::ZERO, 0.2);
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, app: &game::App) {
+        let transform = self.game.render(gl, trans, tputil::Point2D::ZERO, 0.2, &app.number_renderer);
         let start = self.game
             .map
             .get_space(self.game.players[self.turn].space)
@@ -125,6 +141,8 @@ impl game::State for BoardMoveState {
                     self.remaining - 1,
                 ));
             } else {
+                self.game.players[self.turn].coins += 3;
+                new_game_state.players[self.turn].coins += 3;
                 app.goto_state(SpaceResultState {
                     game: new_game_state,
                     time: 0.0,
@@ -142,8 +160,8 @@ struct SpaceResultState {
 }
 
 impl game::State for SpaceResultState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
-        let transform = self.game.render(gl, trans, tputil::Point2D::ZERO, 0.2);
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, app: &game::App) {
+        let transform = self.game.render(gl, trans, tputil::Point2D::ZERO, 0.2, &app.number_renderer);
         let player = self.game.players[self.turn];
         let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();

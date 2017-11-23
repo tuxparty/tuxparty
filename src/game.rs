@@ -24,7 +24,7 @@ impl App {
             .trans(area[0] as f64 / 2.0, area[1] as f64 / 2.0)
             .scale(scale, scale);
         let state = self.state.take().unwrap();
-        state.render(gl, transform);
+        state.render(gl, transform, &self);
         self.state = Some(state);
     }
 
@@ -43,7 +43,7 @@ impl App {
 }
 
 pub trait State {
-    fn render(&self, &mut opengl_graphics::GlGraphics, graphics::math::Matrix2d);
+    fn render(&self, &mut opengl_graphics::GlGraphics, graphics::math::Matrix2d, &App);
     fn update(&mut self, &mut App, f64);
 }
 

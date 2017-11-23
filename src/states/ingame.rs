@@ -48,7 +48,7 @@ impl GameInfo {
             graphics::rectangle(
                 match space.space_type {
                     board::SpaceType::Positive => COLOR2,
-                    board::SpaceType::Negative => COLOR1
+                    board::SpaceType::Negative => COLOR1,
                 },
                 graphics::rectangle::centered_square(space.pos.x, space.pos.y, 1.0),
                 transform,
@@ -59,15 +59,28 @@ impl GameInfo {
             let coins = format!("{}", self.players[i].coins);
             let size = 0.4;
             let mut x = -1.0;
+            let mut text_x;
             let mut y = -1.0;
             if i == 1 || i == 3 {
-                x = 1.0 - number_renderer.get_str_width(&coins, size);
+                x = 1.0 - size;
+                text_x = -number_renderer.get_str_width(&coins, size) + size / 3.0;
+            } else {
+                text_x = size * 2.0 / 3.0;
             }
+
             if i == 2 || i == 3 {
                 y = 1.0 - size;
             }
-            println!("printing {} at {},{}", coins, x, y);
-            number_renderer.draw_str(&coins, size, trans.trans(x, y), gl);
+
+            let color = tputil::COLORS[self.players[i].player.color];
+
+            graphics::rectangle(
+                color,
+                [x + size / 3.0, y + size / 3.0, size / 3.0, size / 3.0],
+                trans,
+                gl,
+            );
+            number_renderer.draw_str(&coins, size, trans.trans(x + text_x, y), gl);
         }
         return transform;
     }
@@ -128,7 +141,12 @@ impl game::State for BoardMoveState {
             transform,
             gl,
         );
-        app.number_renderer.draw_digit(self.remaining as usize, 0.4, transform.trans(pos.x, pos.y - 2.0), gl);
+        app.number_renderer.draw_digit(
+            self.remaining as usize,
+            0.4,
+            transform.trans(pos.x, pos.y - 2.0),
+            gl,
+        );
     }
     fn update(&mut self, app: &mut game::App, time: f64) {
         self.time += time;
@@ -150,10 +168,18 @@ impl game::State for BoardMoveState {
                     self.remaining - 1,
                 ));
             } else {
-                new_game_state.players[self.turn].coins = (new_game_state.players[self.turn].coins as i64 + match self.game.map.get_space(new_game_state.players[self.turn].space).unwrap().space_type {
-                    board::SpaceType::Positive => 3,
-                    board::SpaceType::Negative => -(3 as i8)
-                } as i64).max(0) as u32;
+                new_game_state.players[self.turn].coins = (new_game_state.players[self.turn].coins
+                    as i64
+                    + match self.game
+                        .map
+                        .get_space(new_game_state.players[self.turn].space)
+                        .unwrap()
+                        .space_type
+                    {
+                        board::SpaceType::Positive => 3,
+                        board::SpaceType::Negative => -(3 as i8),
+                    } as i64)
+                    .max(0) as u32;
                 app.goto_state(SpaceResultState {
                     game: new_game_state,
                     time: 0.0,
@@ -217,7 +243,7 @@ impl DieRollState {
             turn: turn,
             number: 0,
             jump: false,
-            time: 0.0
+            time: 0.0,
         };
     }
 }
@@ -234,8 +260,10 @@ impl game::State for DieRollState {
                     self.number,
                 ));
             }
-        }
-        else if app.input.is_pressed(&self.game.players[self.turn].player.input, tputil::Button::South) {
+        } else if app.input.is_pressed(
+            &self.game.players[self.turn].player.input,
+            tputil::Button::South,
+        ) {
             self.jump = true;
         }
         if self.time < 1.0 {
@@ -257,8 +285,7 @@ impl game::State for DieRollState {
         let y;
         if self.jump {
             y = -(self.time - 1.0).powf(2.0) + 1.0;
-        }
-        else {
+        } else {
             y = 0.0;
         }
         graphics::rectangle(
@@ -267,6 +294,11 @@ impl game::State for DieRollState {
             transform,
             gl,
         );
-        app.number_renderer.draw_digit(self.number as usize, 0.4, transform.trans(space.pos.x, space.pos.y - 2.0), gl);
+        app.number_renderer.draw_digit(
+            self.number as usize,
+            0.4,
+            transform.trans(space.pos.x, space.pos.y - 2.0),
+            gl,
+        );
     }
 }

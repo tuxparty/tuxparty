@@ -40,12 +40,16 @@ impl GameInfo {
         scale: f64,
         number_renderer: &game::NumberRenderer,
     ) -> graphics::math::Matrix2d {
-        const COLOR1: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
+        const COLOR1: [f32; 4] = [1.0, 0.2, 0.0, 1.0];
+        const COLOR2: [f32; 4] = [0.0, 0.8, 1.0, 1.0];
 
         let transform = (-center).translate(trans).scale(scale, scale);
         for space in &self.map.spaces {
             graphics::rectangle(
-                COLOR1,
+                match space.space_type {
+                    board::SpaceType::Positive => COLOR2,
+                    board::SpaceType::Negative => COLOR1
+                },
                 graphics::rectangle::centered_square(space.pos.x, space.pos.y, 1.0),
                 transform,
                 gl,
@@ -97,9 +101,6 @@ impl BoardMoveState {
             remaining: remaining,
         };
     }
-    pub fn new_start(info: GameInfo) -> BoardMoveState {
-        return BoardMoveState::new(info, 0, 0, 4);
-    }
 }
 
 impl game::State for BoardMoveState {
@@ -149,8 +150,10 @@ impl game::State for BoardMoveState {
                     self.remaining - 1,
                 ));
             } else {
-                self.game.players[self.turn].coins += 3;
-                new_game_state.players[self.turn].coins += 3;
+                new_game_state.players[self.turn].coins = (new_game_state.players[self.turn].coins as i64 + match self.game.map.get_space(new_game_state.players[self.turn].space).unwrap().space_type {
+                    board::SpaceType::Positive => 3,
+                    board::SpaceType::Negative => -(3 as i8)
+                } as i64).max(0) as u32;
                 app.goto_state(SpaceResultState {
                     game: new_game_state,
                     time: 0.0,

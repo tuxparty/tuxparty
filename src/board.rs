@@ -2,11 +2,18 @@ use tputil;
 
 pub type SpaceID = usize;
 
+#[derive(Copy, Clone)]
+pub enum SpaceType {
+    Positive,
+    Negative
+}
+
 #[derive(Clone)]
 pub struct Space {
     pub id: SpaceID,
     pub transitions: Box<[SpaceTransition]>,
-    pub pos: tputil::Point2D
+    pub pos: tputil::Point2D,
+    pub space_type: SpaceType
 }
 
 #[derive(Copy, Clone)]
@@ -26,17 +33,20 @@ impl Board {
                 Space {
                     id: 0,
                     transitions: Box::new([SpaceTransition { to: 32 }]),
-                    pos: tputil::Point2D::new(0.0, 0.0)
+                    pos: tputil::Point2D::new(0.0, 0.0),
+                    space_type: SpaceType::Positive
                 },
                 Space {
                     id: 32,
                     transitions: Box::new([SpaceTransition { to: 66 }]),
-                    pos: tputil::Point2D::new(2.0, 0.7)
+                    pos: tputil::Point2D::new(2.0, 0.7),
+                    space_type: SpaceType::Negative
                 },
                 Space {
                     id: 66,
                     transitions: Box::new([SpaceTransition { to: 0 }]),
-                    pos: tputil::Point2D::new(-1.2, 1.2)
+                    pos: tputil::Point2D::new(-1.2, 1.2),
+                    space_type: SpaceType::Positive
                 }
             ]
         };

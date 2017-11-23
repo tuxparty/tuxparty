@@ -1,5 +1,6 @@
-extern crate opengl_graphics;
 extern crate graphics;
+extern crate opengl_graphics;
+extern crate image;
 
 use tputil;
 use graphics::Transformed;
@@ -7,7 +8,8 @@ use std;
 
 pub struct App {
     pub input: tputil::InputState,
-    pub state: Option<Box<State>>
+    pub state: Option<Box<State>>,
+    pub number_renderer: NumberRenderer
 }
 
 impl App {
@@ -19,10 +21,7 @@ impl App {
 
         graphics::clear(BGCOLOR, gl);
         let transform = c.transform
-            .trans(
-                area[0] as f64 / 2.0,
-                area[1] as f64 / 2.0
-            )
+            .trans(area[0] as f64 / 2.0, area[1] as f64 / 2.0)
             .scale(scale, scale);
         let state = self.state.take().unwrap();
         state.render(gl, transform);
@@ -46,4 +45,49 @@ impl App {
 pub trait State {
     fn render(&self, &mut opengl_graphics::GlGraphics, graphics::math::Matrix2d);
     fn update(&mut self, &mut App, f64);
+}
+
+pub struct NumberRenderer {
+    digits: [opengl_graphics::Texture; 10],
+}
+
+macro_rules! load_number {
+    ($x:expr) => {
+        opengl_graphics::Texture::from_image(&match image::load_from_memory(include_bytes!($x)).unwrap() {
+            image::DynamicImage::ImageRgba8(img) => img,
+            x => x.to_rgba()
+        }, &opengl_graphics::TextureSettings::new());
+    };
+}
+
+impl NumberRenderer {
+    pub fn new() -> NumberRenderer {
+        return NumberRenderer {
+            digits: [
+                load_number!("../assets/art/numbers/0.png"),
+                load_number!("../assets/art/numbers/1.png"),
+                load_number!("../assets/art/numbers/0.png"),
+                load_number!("../assets/art/numbers/0.png"),
+                load_number!("../assets/art/numbers/0.png"),
+                load_number!("../assets/art/numbers/0.png"),
+                load_number!("../assets/art/numbers/6.png"),
+                load_number!("../assets/art/numbers/7.png"),
+                load_number!("../assets/art/numbers/8.png"),
+                load_number!("../assets/art/numbers/9.png")
+            ],
+        };
+    }
+
+    pub fn get_str_width(&self, string: &str, size: f64) -> f64 {
+        return size * 5.0 * string.chars().count() as f64 / 7.0;
+    }
+
+    pub fn draw_str(&self, string: &str, size: f64, transform: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
+        let scale = size / 140.0;
+        for (i, c) in string.char_indices() {
+            let digit_index = c.to_digit(10).unwrap_or(0) as usize;
+            let digit = &self.digits[digit_index];
+            graphics::image(digit, transform.scale(scale, scale).trans(100.0 * i as f64, 0.0), gl);
+        }
+    }
 }

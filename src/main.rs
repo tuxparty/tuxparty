@@ -27,6 +27,7 @@ fn main() {
     let mut app = game::App {
         input: tputil::InputState::new(),
         state: Some(Box::new(states::setup::MenuState {})),
+        number_renderer: game::NumberRenderer::new()
     };
 
     let mut events = piston::event_loop::Events::new(piston::event_loop::EventSettings::new());

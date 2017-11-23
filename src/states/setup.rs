@@ -135,7 +135,7 @@ impl game::State for JoinState {
                 .collect();
             let board = board::Board::get_default_board();
             let game = states::ingame::GameInfo::new(players, board);
-            app.goto_state(states::ingame::BoardMoveState::new_start(game));
+            app.goto_state(states::ingame::DieRollState::new(game, 0));
         }
     }
 }

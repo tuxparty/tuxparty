@@ -83,11 +83,15 @@ impl NumberRenderer {
     }
 
     pub fn draw_str(&self, string: &str, size: f64, transform: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
-        let scale = size / 140.0;
         for (i, c) in string.char_indices() {
             let digit_index = c.to_digit(10).unwrap_or(0) as usize;
-            let digit = &self.digits[digit_index];
-            graphics::image(digit, transform.scale(scale, scale).trans(100.0 * i as f64, 0.0), gl);
+            self.draw_digit(digit_index, size, transform.trans(100.0 * i as f64 * size / 140.0, 0.0), gl);
         }
+    }
+
+    pub fn draw_digit(&self, digit_index: usize, size: f64, transform: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
+        let digit = &self.digits[digit_index];
+        let scale = size / 140.0;
+        graphics::image(digit, transform.scale(scale, scale), gl);
     }
 }

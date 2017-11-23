@@ -12,7 +12,7 @@ use graphics::Transformed;
 pub struct PlayerInfo {
     pub player: tputil::Player,
     pub space: board::SpaceID,
-    pub coins: u32
+    pub coins: u32,
 }
 
 #[derive(Clone)]
@@ -38,7 +38,7 @@ impl GameInfo {
         trans: graphics::math::Matrix2d,
         center: tputil::Point2D,
         scale: f64,
-        number_renderer: &game::NumberRenderer
+        number_renderer: &game::NumberRenderer,
     ) -> graphics::math::Matrix2d {
         const COLOR1: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
@@ -103,8 +103,15 @@ impl BoardMoveState {
 }
 
 impl game::State for BoardMoveState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, app: &game::App) {
-        let transform = self.game.render(gl, trans, tputil::Point2D::ZERO, 0.2, &app.number_renderer);
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        app: &game::App,
+    ) {
+        let transform =
+            self.game
+                .render(gl, trans, tputil::Point2D::ZERO, 0.2, &app.number_renderer);
         let start = self.game
             .map
             .get_space(self.game.players[self.turn].space)
@@ -120,6 +127,7 @@ impl game::State for BoardMoveState {
             transform,
             gl,
         );
+        app.number_renderer.draw_digit(self.remaining as usize, 0.4, transform.trans(pos.x, pos.y - 2.0), gl);
     }
     fn update(&mut self, app: &mut game::App, time: f64) {
         self.time += time;
@@ -160,8 +168,15 @@ struct SpaceResultState {
 }
 
 impl game::State for SpaceResultState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, app: &game::App) {
-        let transform = self.game.render(gl, trans, tputil::Point2D::ZERO, 0.2, &app.number_renderer);
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        app: &game::App,
+    ) {
+        let transform =
+            self.game
+                .render(gl, trans, tputil::Point2D::ZERO, 0.2, &app.number_renderer);
         let player = self.game.players[self.turn];
         let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();
@@ -176,10 +191,79 @@ impl game::State for SpaceResultState {
         self.time += time;
         if self.time > 1.0 {
             if self.turn + 1 < self.game.players.len() {
-                app.goto_state(BoardMoveState::new(self.game.clone(), 0, self.turn + 1, 3));
+                app.goto_state(DieRollState::new(self.game.clone(), self.turn + 1));
             } else {
                 app.goto_state(states::minigame::MinigameState::new(self.game.clone()));
             }
         }
+    }
+}
+
+pub struct DieRollState {
+    game: GameInfo,
+    time: f64,
+    jump: bool,
+    turn: usize,
+    number: u8,
+}
+
+impl DieRollState {
+    pub fn new(game: GameInfo, turn: usize) -> DieRollState {
+        return DieRollState {
+            game: game,
+            turn: turn,
+            number: 0,
+            jump: false,
+            time: 0.0
+        };
+    }
+}
+
+impl game::State for DieRollState {
+    fn update(&mut self, app: &mut game::App, time: f64) {
+        if self.jump {
+            self.time += time * 4.0;
+            if self.time > 2.0 {
+                app.goto_state(BoardMoveState::new(
+                    self.game.clone(),
+                    0,
+                    self.turn,
+                    self.number,
+                ));
+            }
+        }
+        else if app.input.is_pressed(&self.game.players[self.turn].player.input, tputil::Button::South) {
+            self.jump = true;
+        }
+        if self.time < 1.0 {
+            self.number = (self.number + 1) % 10;
+        }
+    }
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        app: &game::App,
+    ) {
+        let transform =
+            self.game
+                .render(gl, trans, tputil::Point2D::ZERO, 0.2, &app.number_renderer);
+        let player = self.game.players[self.turn];
+        let color = tputil::COLORS[player.player.color];
+        let space = self.game.map.get_space(player.space).unwrap();
+        let y;
+        if self.jump {
+            y = -(self.time - 1.0).powf(2.0) + 1.0;
+        }
+        else {
+            y = 0.0;
+        }
+        graphics::rectangle(
+            color,
+            graphics::rectangle::centered_square(space.pos.x, space.pos.y - y, 1.0),
+            transform,
+            gl,
+        );
+        app.number_renderer.draw_digit(self.number as usize, 0.4, transform.trans(space.pos.x, space.pos.y - 2.0), gl);
     }
 }

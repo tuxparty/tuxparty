@@ -26,7 +26,7 @@ impl game::State for MinigameState {
             if result < self.game.players.len() {
                 new_game_state.players[result].coins += 10;
             }
-            app.goto_state(states::ingame::BoardMoveState::new_start(new_game_state));
+            app.goto_state(states::ingame::DieRollState::new(new_game_state, 0));
         }
     }
 }

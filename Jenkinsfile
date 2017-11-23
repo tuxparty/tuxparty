@@ -5,7 +5,7 @@ pipeline {
 		}
 	}
 	stages {
-		state('Build') {
+		stage('Build') {
 			steps {
 				sh 'cargo build --release'
 			}

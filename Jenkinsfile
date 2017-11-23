@@ -1,7 +1,7 @@
 pipeline {
 	agent {
 		docker {
-			image 'rust:1.19.0'
+			image 'rust:1.22.1'
 		}
 	}
 	stages {

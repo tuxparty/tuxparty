@@ -20,9 +20,13 @@ impl game::State for MinigameState {
     }
     fn update(&mut self, app: &mut game::App, time: f64) {
         let result = self.minigame.update(app, time);
-        if result.is_some() {
+        if let Some(result) = result {
             println!("returned from minigame");
-            app.goto_state(states::ingame::BoardMoveState::new_start(self.game.clone()));
+            let mut new_game_state = self.game.clone();
+            if result < self.game.players.len() {
+                new_game_state.players[result].coins += 10;
+            }
+            app.goto_state(states::ingame::BoardMoveState::new_start(new_game_state));
         }
     }
 }

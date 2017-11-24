@@ -39,6 +39,7 @@ impl GameInfo {
         center: tputil::Point2D,
         scale: f64,
         number_renderer: &game::NumberRenderer,
+        hide: &[usize],
     ) -> graphics::math::Matrix2d {
         const COLOR1: [f32; 4] = [1.0, 0.2, 0.0, 1.0];
         const COLOR2: [f32; 4] = [0.0, 0.8, 1.0, 1.0];
@@ -54,6 +55,24 @@ impl GameInfo {
                 transform,
                 gl,
             );
+            let mut so_far = 0;
+            for i in 0..self.players.len() {
+                if self.players[i].space == space.id && !hide.contains(&i) {
+                    let color = tputil::COLORS[self.players[i].player.color];
+                    graphics::rectangle(
+                        color,
+                        [
+                            space.pos.x - 1.0 + so_far as f64 * 2.0 / 3.0,
+                            space.pos.y + 1.0,
+                            0.5,
+                            0.5,
+                        ],
+                        transform,
+                        gl,
+                    );
+                    so_far += 1;
+                }
+            }
         }
         for i in 0..self.players.len().min(4) {
             let coins = format!("{}", self.players[i].coins);
@@ -123,9 +142,14 @@ impl game::State for BoardMoveState {
         trans: graphics::math::Matrix2d,
         app: &game::App,
     ) {
-        let transform =
-            self.game
-                .render(gl, trans, tputil::Point2D::ZERO, 0.2, &app.number_renderer);
+        let transform = self.game.render(
+            gl,
+            trans,
+            tputil::Point2D::ZERO,
+            0.2,
+            &app.number_renderer,
+            &[self.turn],
+        );
         let start = self.game
             .map
             .get_space(self.game.players[self.turn].space)
@@ -137,7 +161,7 @@ impl game::State for BoardMoveState {
         let color = tputil::COLORS[self.game.players[self.turn].player.color];
         graphics::rectangle(
             color,
-            graphics::rectangle::centered_square(pos.x, pos.y, 1.0),
+            graphics::rectangle::centered_square(pos.x, pos.y, 0.7),
             transform,
             gl,
         );
@@ -203,15 +227,20 @@ impl game::State for SpaceResultState {
         trans: graphics::math::Matrix2d,
         app: &game::App,
     ) {
-        let transform =
-            self.game
-                .render(gl, trans, tputil::Point2D::ZERO, 0.2, &app.number_renderer);
+        let transform = self.game.render(
+            gl,
+            trans,
+            tputil::Point2D::ZERO,
+            0.2,
+            &app.number_renderer,
+            &[self.turn],
+        );
         let player = self.game.players[self.turn];
         let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();
         graphics::rectangle(
             color,
-            graphics::rectangle::centered_square(space.pos.x, space.pos.y, 1.0),
+            graphics::rectangle::centered_square(space.pos.x, space.pos.y, 0.7),
             transform,
             gl,
         );
@@ -267,7 +296,10 @@ impl game::State for DieRollState {
             self.jump = true;
         }
         if self.time < 1.0 {
-            self.number = (self.number + 1) % 10;
+            self.number += 1;
+            if self.number > 9 {
+                self.number = 1;
+            }
         }
     }
     fn render(
@@ -276,9 +308,14 @@ impl game::State for DieRollState {
         trans: graphics::math::Matrix2d,
         app: &game::App,
     ) {
-        let transform =
-            self.game
-                .render(gl, trans, tputil::Point2D::ZERO, 0.2, &app.number_renderer);
+        let transform = self.game.render(
+            gl,
+            trans,
+            tputil::Point2D::ZERO,
+            0.2,
+            &app.number_renderer,
+            &[self.turn],
+        );
         let player = self.game.players[self.turn];
         let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();
@@ -290,7 +327,7 @@ impl game::State for DieRollState {
         }
         graphics::rectangle(
             color,
-            graphics::rectangle::centered_square(space.pos.x, space.pos.y - y, 1.0),
+            graphics::rectangle::centered_square(space.pos.x, space.pos.y - y, 0.7),
             transform,
             gl,
         );

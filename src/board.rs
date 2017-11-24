@@ -45,7 +45,7 @@ impl Board {
                 Space {
                     id: 66,
                     transitions: Box::new([SpaceTransition { to: 0 }]),
-                    pos: tputil::Point2D::new(-1.2, 1.2),
+                    pos: tputil::Point2D::new(-2.1, 1.4),
                     space_type: SpaceType::Positive
                 }
             ]

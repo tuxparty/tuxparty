@@ -1,7 +1,7 @@
 pipeline {
 	agent {
 		docker {
-			image 'rust-input-docker'
+			image 'vpzom/rust-input:1.0'
 			args '--cpus=0.8'
 		}
 	}

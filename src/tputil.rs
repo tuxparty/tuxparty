@@ -7,8 +7,7 @@ pub use gilrs::Button;
 
 use graphics::Transformed;
 
-pub const COLORS: [[f32; 4]; 6] = [
-    [1.0, 0.0, 0.0, 1.0],
+pub const COLORS: [[f32; 4]; 5] = [
     [0.0, 1.0, 0.0, 1.0],
     [0.0, 0.0, 1.0, 1.0],
     [1.0, 1.0, 0.0, 1.0],

@@ -15,7 +15,12 @@ pub struct MinigameState {
 }
 
 impl game::State for MinigameState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _: &game::App) {
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        _: &game::App,
+    ) {
         self.minigame.render(gl, trans);
     }
     fn update(&mut self, app: &mut game::App, time: f64) {
@@ -26,7 +31,7 @@ impl game::State for MinigameState {
             if result < self.game.players.len() {
                 new_game_state.players[result].coins += 10;
             }
-            app.goto_state(states::ingame::DieRollState::new(new_game_state, 0));
+            app.goto_state(MinigameResultState::new(new_game_state, result));
         }
     }
 }
@@ -46,6 +51,60 @@ impl MinigameState {
             game: game,
             minigame: Box::new(MGQuickdraw::new(slice)),
         };
+    }
+}
+
+struct MinigameResultState {
+    game: states::ingame::GameInfo,
+    time: f64,
+    winner: usize,
+}
+
+impl MinigameResultState {
+    pub fn new(game: states::ingame::GameInfo, winner: usize) -> MinigameResultState {
+        return MinigameResultState {
+            game: game,
+            time: 0.0,
+            winner: winner,
+        };
+    }
+}
+
+impl game::State for MinigameResultState {
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        app: &game::App,
+    ) {
+        let scale = 2.0 / self.game.players.len() as f64;
+        for i in 0..self.game.players.len() {
+            let color = tputil::COLORS[self.game.players[i].player.color];
+            graphics::rectangle(
+                color,
+                graphics::rectangle::centered_square(
+                    scale / 2.0 - 1.0,
+                    (i as f64 + 0.5) * scale - 1.0,
+                    scale / 3.0,
+                ),
+                trans,
+                gl,
+            );
+            let number;
+            if self.winner == i {
+                number = "10";
+            }
+            else {
+                number = "0";
+            }
+            app.number_renderer.draw_str(number, scale, trans.trans(scale - 1.0, scale * i as f64 - 1.0), gl);
+        }
+    }
+    fn update(&mut self, app: &mut game::App, time: f64) {
+        self.time += time;
+        if self.time > 3.0 {
+            app.goto_state(states::ingame::DieRollState::new(self.game.clone(), 0));
+        }
     }
 }
 

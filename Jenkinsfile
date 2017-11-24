@@ -9,6 +9,7 @@ pipeline {
 		stage('Build') {
 			steps {
 				sh 'cargo build --release'
+				archiveArtifacts artifacts: '**/target/tuxparty', fingerprint: true
 			}
 		}
 	}

@@ -33,31 +33,31 @@ impl Board {
                 Space {
                     id: 0,
                     transitions: Box::new([SpaceTransition { to: 32 }]),
-                    pos: tputil::Point2D::new(0.0, 0.0),
+                    pos: tputil::Point2D::new(0.0, -1.0),
                     space_type: SpaceType::Positive
                 },
                 Space {
                     id: 32,
                     transitions: Box::new([SpaceTransition { to: 66 }]),
-                    pos: tputil::Point2D::new(2.0, 0.7),
+                    pos: tputil::Point2D::new(2.0, -0.3),
                     space_type: SpaceType::Negative
                 },
                 Space {
                     id: 66,
                     transitions: Box::new([SpaceTransition { to: 98 }]),
-                    pos: tputil::Point2D::new(-0.9, 2.9),
+                    pos: tputil::Point2D::new(-0.9, 1.9),
                     space_type: SpaceType::Positive
                 },
                 Space {
                     id: 98,
                     transitions: Box::new([SpaceTransition { to: 120 }]),
-                    pos: tputil::Point2D::new(-3.0, 3.9),
+                    pos: tputil::Point2D::new(-3.0, 2.9),
                     space_type: SpaceType::Positive
                 },
                 Space {
                     id: 120,
                     transitions: Box::new([SpaceTransition { to: 0 }]),
-                    pos: tputil::Point2D::new(-3.5, -1.0),
+                    pos: tputil::Point2D::new(-3.5, -2.0),
                     space_type: SpaceType::Negative
                 }
             ]

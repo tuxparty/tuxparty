@@ -146,7 +146,7 @@ impl game::State for BoardMoveState {
             gl,
             trans,
             tputil::Point2D::ZERO,
-            0.2,
+            0.15,
             &app.number_renderer,
             &[self.turn],
         );
@@ -231,7 +231,7 @@ impl game::State for SpaceResultState {
             gl,
             trans,
             tputil::Point2D::ZERO,
-            0.2,
+            0.15,
             &app.number_renderer,
             &[self.turn],
         );
@@ -312,7 +312,7 @@ impl game::State for DieRollState {
             gl,
             trans,
             tputil::Point2D::ZERO,
-            0.2,
+            0.15,
             &app.number_renderer,
             &[self.turn],
         );

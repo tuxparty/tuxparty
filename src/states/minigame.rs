@@ -258,7 +258,7 @@ impl Minigame for MGHotRope {
         for i in 0..self.players.len() {
             let y;
             if self.swept_at[i] < 0.0 {
-                y = (((self.time - self.jumped_at[i]) * 4.0 - 1.0).powf(2.0) - 1.0).min(0.0);
+                y = (((self.time - self.jumped_at[i]) * 4.0 - 1.0).powf(2.0) - 1.0).min(0.0) / 2.0;
             }
             else {
                 y = (self.swept_at[i] - self.time) * self.speed;

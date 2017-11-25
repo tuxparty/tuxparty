@@ -493,11 +493,9 @@ impl Minigame for MGSnake {
                 }
                 if !dies {
                     for (index2, snake2) in self.snakes.iter().enumerate() {
-                        if index == index2 {
-                            continue;
-                        }
-                        for cube in &snake2.tail {
-                            if cube == &head {
+                        for (i, cube) in snake2.tail.iter().enumerate() {
+                            if cube == &head && !(i == snake2.tail.len()-1 && index == index2) {
+                                println!("crash");
                                 dies = true;
                                 break;
                             }

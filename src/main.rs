@@ -39,7 +39,7 @@ fn main() {
         if let Some(u) = e.update_args() {
             let multiplier;
             if app.input.is_key_pressed(&piston::input::keyboard::Key::F4) {
-                multiplier = 2.0;
+                multiplier = 3.0;
             }
             else {
                 multiplier = 1.0;

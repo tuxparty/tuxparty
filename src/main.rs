@@ -7,9 +7,9 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
 extern crate rand;
-extern crate glutin_window;
+extern crate sdl2_window;
 
-use glutin_window::GlutinWindow as Window;
+use sdl2_window::Sdl2Window as Window;
 use piston::input::{RenderEvent, UpdateEvent, PressEvent, ReleaseEvent};
 
 fn main() {

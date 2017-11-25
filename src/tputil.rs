@@ -107,11 +107,11 @@ impl InputState {
                 }
                 Axis::LeftStickY => {
                     return (match self.keyboard_state.get(&piston::input::Key::Up) {
-                        Some(_) => -1.0,
+                        Some(_) => 1.0,
                         _ => 0.0,
                     })
                         + match self.keyboard_state.get(&piston::input::Key::Down) {
-                            Some(_) => 1.0,
+                            Some(_) => -1.0,
                             _ => 0.0,
                         }
                 }

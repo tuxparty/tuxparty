@@ -122,7 +122,7 @@ impl BoardMoveState {
             let end_space = info.map
                 .get_space(start_space.transitions[transition].to)
                 .unwrap();
-            duration = tputil::Point2D::dist(start_space.pos, end_space.pos) / 3.0;
+            duration = tputil::Point2D::dist(start_space.pos, end_space.pos) / 5.0;
         };
         return BoardMoveState {
             game: info,

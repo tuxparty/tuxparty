@@ -51,11 +51,12 @@ impl MinigameState {
             Box::new(MGQuickdraw::init),
             Box::new(MGHotRope::init),
             Box::new(MGSnake::init),
+            Box::new(MGCastleClimb::init),
         ]);
         return MinigameState {
             game: game,
-            minigame: games_list[rand::thread_rng().gen_range(0, games_list.len())](slice),
-            //minigame: games_list[2](slice),
+            //minigame: games_list[rand::thread_rng().gen_range(0, games_list.len())](slice),
+            minigame: games_list[3](slice),
         };
     }
 }
@@ -494,7 +495,7 @@ impl Minigame for MGSnake {
                 if !dies {
                     for (index2, snake2) in self.snakes.iter().enumerate() {
                         for (i, cube) in snake2.tail.iter().enumerate() {
-                            if cube == &head && !(i == snake2.tail.len()-1 && index == index2) {
+                            if cube == &head && !(i == snake2.tail.len() - 1 && index == index2) {
                                 println!("crash");
                                 dies = true;
                                 break;
@@ -528,5 +529,114 @@ impl Minigame for MGSnake {
             return Some(last_alive as usize);
         }
         return None;
+    }
+}
+
+struct CCPlayer {
+    player: tputil::Player,
+    position: tputil::Point2D,
+    velocity: tputil::Point2D,
+}
+
+struct MGCastleClimb {
+    blocks: Vec<tputil::Point2D>,
+    players: Box<[CCPlayer]>,
+}
+
+impl MGCastleClimb {
+    fn init(players: Box<[tputil::Player]>) -> Box<Minigame> {
+        return Box::new(MGCastleClimb {
+            blocks: vec![tputil::Point2D::ZERO],
+            players: players
+                .iter()
+                .map(|player| {
+                    CCPlayer {
+                        player: *player,
+                        position: tputil::Point2D::new(0.0, -0.2),
+                        velocity: tputil::Point2D::ZERO,
+                    }
+                })
+                .collect::<Vec<CCPlayer>>()
+                .into_boxed_slice(),
+        });
+    }
+    const JUMP_VEL: f64 = 1.0;
+    const HORIZ_VEL: f64 = 0.5;
+    const GRAVITY: f64 = 1.0;
+    const MAX_HEIGHT: f64 =
+        (MGCastleClimb::JUMP_VEL * MGCastleClimb::JUMP_VEL) / (2.0 * MGCastleClimb::GRAVITY);
+    const BLOCK_SIZE: f64 = 0.1;
+    const PLAYER_SIZE: f64 = 0.05;
+}
+
+impl Minigame for MGCastleClimb {
+    fn update(&mut self, app: &game::App, time: f64) -> Option<usize> {
+        let diff = tputil::Point2D::new(0.0, time * 0.2);
+        self.blocks = self.blocks
+            .iter()
+            .map(|block| *block + diff)
+            .filter(|block| block.y < 2.0)
+            .collect();
+        for player in self.players.iter_mut() {
+            player.velocity.x = app.input.get_axis(&player.player.input, tputil::Axis::LeftStickX) as f64;
+            player.position = player.position + diff + player.velocity.multiply_scalar(time);
+            player.velocity.y += MGCastleClimb::GRAVITY * time;
+            for block in &self.blocks {
+                if player.position.x + MGCastleClimb::PLAYER_SIZE
+                    > block.x - MGCastleClimb::BLOCK_SIZE
+                    && player.position.x - MGCastleClimb::PLAYER_SIZE
+                        < block.x + MGCastleClimb::BLOCK_SIZE
+                    && player.position.y + MGCastleClimb::PLAYER_SIZE
+                        > block.y - MGCastleClimb::BLOCK_SIZE
+                    && player.position.y - MGCastleClimb::PLAYER_SIZE
+                        < block.y + MGCastleClimb::BLOCK_SIZE
+                {
+                    player.position.y =
+                        block.y - MGCastleClimb::BLOCK_SIZE - MGCastleClimb::PLAYER_SIZE;
+                    player.velocity.y = 0.0;
+                    if app.input.is_pressed(&player.player.input, tputil::Button::South) {
+                        player.velocity.y = -MGCastleClimb::JUMP_VEL;
+                    }
+                }
+            }
+        }
+        let mut last = self.blocks[self.blocks.len() - 1];
+        while last.y > -2.0 {
+            println!("{}", MGCastleClimb::MAX_HEIGHT);
+            let y = -rand::thread_rng().gen_range(0.0, MGCastleClimb::MAX_HEIGHT);
+            let t = (-MGCastleClimb::JUMP_VEL - MGCastleClimb::JUMP_VEL.powf(2.0)
+                + 2.0 * y * MGCastleClimb::GRAVITY) / 2.0 * y;
+            let mut x = 1.0 * MGCastleClimb::HORIZ_VEL * t;
+            if x + last.x > 1.0 || (last.x - x > -1.0 && rand::thread_rng().gen_weighted_bool(2)) {
+                x = -x;
+            }
+            last = last + tputil::Point2D::new(x, y);
+            self.blocks.push(last);
+        }
+        return None;
+    }
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
+        const COLOR1: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
+        for block in &self.blocks {
+            graphics::rectangle(
+                COLOR1,
+                graphics::rectangle::centered_square(block.x, block.y, MGCastleClimb::BLOCK_SIZE),
+                trans,
+                gl,
+            );
+        }
+        for player in self.players.iter() {
+            println!("{} {}", player.position.x, player.position.y);
+            graphics::rectangle(
+                tputil::COLORS[player.player.color],
+                graphics::rectangle::centered_square(
+                    player.position.x,
+                    player.position.y,
+                    MGCastleClimb::PLAYER_SIZE,
+                ),
+                trans,
+                gl,
+            );
+        }
     }
 }

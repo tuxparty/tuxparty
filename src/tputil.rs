@@ -31,9 +31,35 @@ impl std::ops::Neg for Point2D {
     }
 }
 
+impl std::ops::Sub for Point2D {
+    type Output = Point2D;
+    fn sub(self, rhs: Point2D) -> Point2D {
+        return Point2D {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y
+        };
+    }
+}
+
+impl std::ops::Add for Point2D {
+    type Output = Point2D;
+    fn add(self, rhs: Point2D) -> Point2D {
+        return Point2D {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y
+        };
+    }
+}
+
 impl Point2D {
     pub fn translate(&self, transform: graphics::math::Matrix2d) -> graphics::math::Matrix2d {
         return transform.trans(self.x, self.y);
+    }
+    pub fn multiply_scalar(&self, a: f64) -> Point2D {
+        return Point2D {
+            x: self.x * a,
+            y: self.y * a
+        };
     }
     pub fn new(x: f64, y: f64) -> Point2D {
         return Point2D { x: x, y: y };

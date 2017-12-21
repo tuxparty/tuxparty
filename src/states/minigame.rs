@@ -338,6 +338,7 @@ struct Snake {
     tail: Vec<(i8, i8)>,
     player: tputil::Player,
     direction: Direction,
+    turned: bool,
 }
 
 struct MGSnake {
@@ -370,6 +371,7 @@ impl MGSnake {
                         _ => Direction::South,
                     },
                     player: players[i],
+                    turned: false,
                 };
             })
             .collect();
@@ -417,21 +419,23 @@ impl Minigame for MGSnake {
         self.unhandled_time += time;
 
         for snake in self.snakes.iter_mut() {
-            if snake.direction == Direction::North || snake.direction == Direction::South {
-                let axis = app.input
-                    .get_axis(&snake.player.input, tputil::Axis::LeftStickX);
-                if axis < -0.4 {
-                    snake.direction = Direction::West;
-                } else if axis > 0.4 {
-                    snake.direction = Direction::East;
-                }
-            } else if snake.direction == Direction::West || snake.direction == Direction::East {
-                let axis = app.input
-                    .get_axis(&snake.player.input, tputil::Axis::LeftStickY);
-                if axis < -0.4 {
-                    snake.direction = Direction::South;
-                } else if axis > 0.4 {
-                    snake.direction = Direction::North;
+            if !snake.turned {
+                if snake.direction == Direction::North || snake.direction == Direction::South {
+                    let axis = app.input
+                        .get_axis(&snake.player.input, tputil::Axis::LeftStickX);
+                    if axis < -0.4 {
+                        snake.direction = Direction::West;
+                    } else if axis > 0.4 {
+                        snake.direction = Direction::East;
+                    }
+                } else if snake.direction == Direction::West || snake.direction == Direction::East {
+                    let axis = app.input
+                        .get_axis(&snake.player.input, tputil::Axis::LeftStickY);
+                    if axis < -0.4 {
+                        snake.direction = Direction::South;
+                    } else if axis > 0.4 {
+                        snake.direction = Direction::North;
+                    }
                 }
             }
         }
@@ -459,11 +463,12 @@ impl Minigame for MGSnake {
                     Direction::West => (old_head.0 - 1, old_head.1),
                 });
             }
-            // eat/retract
+            // eat / retract / reset turned
             for snake in self.snakes.iter_mut() {
                 if snake.tail.len() < 1 {
                     continue;
                 }
+                snake.turned = false;
                 let head = snake.tail[snake.tail.len() - 1];
                 let mut grow = false;
                 for i in 0..self.pellets.len() {
@@ -541,7 +546,7 @@ struct CCPlayer {
 struct MGCastleClimb {
     blocks: Vec<tputil::Point2D>,
     players: Box<[CCPlayer]>,
-    time: f64
+    time: f64,
 }
 
 impl MGCastleClimb {
@@ -559,7 +564,7 @@ impl MGCastleClimb {
                 })
                 .collect::<Vec<CCPlayer>>()
                 .into_boxed_slice(),
-            time: 0.0
+            time: 0.0,
         });
     }
     const JUMP_VEL: f64 = 1.0;
@@ -620,8 +625,8 @@ impl Minigame for MGCastleClimb {
         if !multiple_alive {
             return match last_alive {
                 Some(index) => Some(index),
-                _ => Some(999)
-            }
+                _ => Some(999),
+            };
         }
         let mut last = self.blocks[self.blocks.len() - 1];
         while last.y > -2.0 {

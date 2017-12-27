@@ -136,7 +136,7 @@ impl Board {
                     id: 17,
                     pos: tputil::Point2D::new(3.0, 3.0),
                     space_type: SpaceType::Positive,
-                    transitions: Box::new([SpaceTransition { to: 16 }])
+                    transitions: Box::new([SpaceTransition { to: 18 }])
                 },
                 Space {
                     id: 18,

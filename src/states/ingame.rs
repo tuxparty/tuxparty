@@ -5,8 +5,10 @@ use states;
 
 use graphics;
 use opengl_graphics;
+use std;
 
 use graphics::Transformed;
+use std::f64::consts::PI;
 
 #[derive(Clone, Copy)]
 pub struct PlayerInfo {
@@ -21,10 +23,7 @@ pub struct GameInfo {
     pub map: board::Board,
 }
 
-const BOARD_CENTER: tputil::Point2D = tputil::Point2D {
-    x: 0.5,
-    y: 0.5
-};
+const BOARD_CENTER: tputil::Point2D = tputil::Point2D { x: 0.5, y: 0.5 };
 
 impl GameInfo {
     pub fn new<I>(players: I, map: board::Board) -> GameInfo
@@ -190,12 +189,21 @@ impl game::State for BoardMoveState {
             new_game_state.players[self.turn].space = transition.to;
 
             if self.remaining > 1 {
-                app.goto_state(BoardMoveState::new(
-                    new_game_state,
-                    0,
-                    self.turn,
-                    self.remaining - 1,
-                ));
+                let end = self.game.map.get_space(transition.to).unwrap();
+                if end.transitions.len() > 1 {
+                    app.goto_state(TransitionChoiceState::new(
+                        new_game_state,
+                        self.turn,
+                        self.remaining - 1,
+                    ));
+                } else {
+                    app.goto_state(BoardMoveState::new(
+                        new_game_state,
+                        0,
+                        self.turn,
+                        self.remaining - 1,
+                    ));
+                }
             } else {
                 new_game_state.players[self.turn].coins = (new_game_state.players[self.turn].coins
                     as i64
@@ -287,12 +295,24 @@ impl game::State for DieRollState {
         if self.jump {
             self.time += time * 4.0;
             if self.time > 2.0 {
-                app.goto_state(BoardMoveState::new(
-                    self.game.clone(),
-                    0,
-                    self.turn,
-                    self.number,
-                ));
+                let space = self.game
+                    .map
+                    .get_space(self.game.players[self.turn].space)
+                    .unwrap();
+                if space.transitions.len() > 1 {
+                    app.goto_state(TransitionChoiceState::new(
+                        self.game.clone(),
+                        self.turn,
+                        self.number,
+                    ));
+                } else {
+                    app.goto_state(BoardMoveState::new(
+                        self.game.clone(),
+                        0,
+                        self.turn,
+                        self.number,
+                    ));
+                }
             }
         } else if app.input.is_pressed(
             &self.game.players[self.turn].player.input,
@@ -342,5 +362,115 @@ impl game::State for DieRollState {
             transform.trans(space.pos.x, space.pos.y - 2.0),
             gl,
         );
+    }
+}
+
+struct TransitionChoiceState {
+    game: GameInfo,
+    turn: usize,
+    time: f64,
+    selected: usize,
+    remaining: u8,
+}
+
+impl TransitionChoiceState {
+    pub fn new(game: GameInfo, turn: usize, remaining: u8) -> Self {
+        TransitionChoiceState {
+            game,
+            turn,
+            remaining,
+            time: 0.0,
+            selected: 0,
+        }
+    }
+}
+
+impl game::State for TransitionChoiceState {
+    fn update(&mut self, app: &mut game::App, time: f64) {
+        self.time += time;
+
+        if app.input.is_pressed(
+            &self.game.players[self.turn].player.input,
+            tputil::Button::South,
+        ) {
+            app.goto_state(BoardMoveState::new(
+                self.game.clone(),
+                self.selected,
+                self.turn,
+                self.remaining,
+            ));
+        } else {
+            let user_angle = app.input
+                .get_axis(
+                    &self.game.players[self.turn].player.input,
+                    tputil::Axis::LeftStickY,
+                )
+                .atan2(app.input.get_axis(
+                    &self.game.players[self.turn].player.input,
+                    tputil::Axis::LeftStickX,
+                )) as f64;
+            let space = self.game
+                .map
+                .get_space(self.game.players[self.turn].space)
+                .unwrap();
+            self.selected = space
+                .transitions
+                .into_iter()
+                .enumerate()
+                .map(|(idx, transition)| {
+                    let pos = self.game.map.get_space(transition.to).unwrap().pos;
+                    let displacement = pos - space.pos;
+                    let angle = displacement.y.atan2(displacement.x);
+                    (idx, (user_angle - angle + PI) % (2.0 * PI) - PI)
+                })
+                .fold((0, std::f64::INFINITY), |(min_idx, min), (idx, current)| {
+                    if min > current {
+                        (idx, current)
+                    }
+                    else {
+                        (min_idx, min)
+                    }
+                }).0;
+        }
+    }
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        app: &game::App,
+    ) {
+        let transform = self.game.render(
+            gl,
+            trans,
+            BOARD_CENTER,
+            0.06,
+            &app.number_renderer,
+            &[self.turn],
+        );
+        let player = self.game.players[self.turn];
+        let color = tputil::COLORS[player.player.color];
+        let space = self.game.map.get_space(player.space).unwrap();
+        graphics::rectangle(
+            color,
+            graphics::rectangle::centered_square(space.pos.x, space.pos.y, 0.7),
+            transform,
+            gl,
+        );
+        for (index, transition) in space.transitions.into_iter().enumerate() {
+            let dest_space = self.game.map.get_space(transition.to).unwrap();
+            let displacement = dest_space.pos - space.pos;
+            let p1 = space.pos + displacement.multiply_scalar(0.2);
+            let p2 = space.pos + displacement.multiply_scalar(0.8);
+            const COLOR1: graphics::types::Color = [1.0, 0.0, 0.0, 1.0];
+            const COLOR2: graphics::types::Color = [0.0, 0.0, 0.0, 0.4];
+            const COLOR3: graphics::types::Color = [1.0, 6.0, 6.0, 0.6];
+            let color = if index == self.selected {
+                COLOR1
+            } else {
+                COLOR3
+            };
+            graphics::line(COLOR2, 0.2, [p1.x, p1.y, p2.x, p2.y], transform, gl);
+            graphics::line(color, 0.15, [p1.x, p1.y, p2.x, p2.y], transform, gl);
+        }
     }
 }

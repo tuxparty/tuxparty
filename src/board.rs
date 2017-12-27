@@ -32,34 +32,184 @@ impl Board {
             spaces: vec![
                 Space {
                     id: 0,
-                    transitions: Box::new([SpaceTransition { to: 32 }]),
-                    pos: tputil::Point2D::new(0.0, -1.0),
-                    space_type: SpaceType::Positive
+                    pos: tputil::Point2D::new(20.0, 20.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 1 }])
                 },
                 Space {
-                    id: 32,
-                    transitions: Box::new([SpaceTransition { to: 66 }]),
-                    pos: tputil::Point2D::new(2.0, -0.3),
-                    space_type: SpaceType::Negative
+                    id: 1,
+                    pos: tputil::Point2D::new(16.0, 20.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 2 }])
                 },
                 Space {
-                    id: 66,
-                    transitions: Box::new([SpaceTransition { to: 98 }]),
-                    pos: tputil::Point2D::new(-0.9, 1.9),
-                    space_type: SpaceType::Positive
+                    id: 2,
+                    pos: tputil::Point2D::new(12.0, 20.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 3 }, SpaceTransition { to: 13 }])
                 },
                 Space {
-                    id: 98,
-                    transitions: Box::new([SpaceTransition { to: 120 }]),
-                    pos: tputil::Point2D::new(-3.0, 2.9),
-                    space_type: SpaceType::Positive
+                    id: 3,
+                    pos: tputil::Point2D::new(9.0, 20.0),
+                    space_type: SpaceType::Negative,
+                    transitions: Box::new([SpaceTransition { to: 4 }])
                 },
                 Space {
-                    id: 120,
-                    transitions: Box::new([SpaceTransition { to: 0 }]),
-                    pos: tputil::Point2D::new(-3.5, -2.0),
-                    space_type: SpaceType::Negative
-                }
+                    id: 4,
+                    pos: tputil::Point2D::new(5.0, 20.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 5 }])
+                },
+                Space {
+                    id: 5,
+                    pos: tputil::Point2D::new(1.0, 20.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 6 }])
+                },
+                Space {
+                    id: 6,
+                    pos: tputil::Point2D::new(-3.0, 20.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 7 }])
+                },
+                Space {
+                    id: 7,
+                    pos: tputil::Point2D::new(-3.0, 16.0),
+                    space_type: SpaceType::Negative,
+                    transitions: Box::new([SpaceTransition { to: 8 }])
+                },
+                Space {
+                    id: 8,
+                    pos: tputil::Point2D::new(-3.0, 12.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 9 }])
+                },
+                Space {
+                    id: 9,
+                    pos: tputil::Point2D::new(-3.0, 8.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 10 }])
+                },
+                Space {
+                    id: 10,
+                    pos: tputil::Point2D::new(-3.0, 4.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 11 }])
+                },
+                Space {
+                    id: 11,
+                    pos: tputil::Point2D::new(-3.0, 0.0),
+                    space_type: SpaceType::Negative,
+                    transitions: Box::new([SpaceTransition { to: 12 }])
+                },
+                Space {
+                    id: 12,
+                    pos: tputil::Point2D::new(0.0, 0.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 18 }])
+                },
+                Space {
+                    id: 13,
+                    pos: tputil::Point2D::new(9.0, 17.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 14 }])
+                },
+                Space {
+                    id: 14,
+                    pos: tputil::Point2D::new(6.0, 14.0),
+                    space_type: SpaceType::Negative,
+                    transitions: Box::new([SpaceTransition { to: 15 }])
+                },
+                Space {
+                    id: 15,
+                    pos: tputil::Point2D::new(3.0, 11.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 16 }])
+                },
+                Space {
+                    id: 16,
+                    pos: tputil::Point2D::new(3.0, 7.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 17 }])
+                },
+                Space {
+                    id: 17,
+                    pos: tputil::Point2D::new(3.0, 3.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 16 }])
+                },
+                Space {
+                    id: 18,
+                    pos: tputil::Point2D::new(3.0, 0.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 19 }])
+                },
+                Space {
+                    id: 19,
+                    pos: tputil::Point2D::new(7.0, 0.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 20 }])
+                },
+                Space {
+                    id: 20,
+                    pos: tputil::Point2D::new(11.0, 0.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 21 }, SpaceTransition { to: 26 }])
+                },
+                Space {
+                    id: 21,
+                    pos: tputil::Point2D::new(15.0, 0.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 22 }])
+                },
+                Space {
+                    id: 22,
+                    pos: tputil::Point2D::new(19.0, 0.0),
+                    space_type: SpaceType::Negative,
+                    transitions: Box::new([SpaceTransition { to: 23 }])
+                },
+                Space {
+                    id: 23,
+                    pos: tputil::Point2D::new(22.0, 0.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 24 }])
+                },
+                Space {
+                    id: 24,
+                    pos: tputil::Point2D::new(22.0, 4.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 25 }])
+                },
+                Space {
+                    id: 25,
+                    pos: tputil::Point2D::new(22.0, 8.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 28 }])
+                },
+                Space {
+                    id: 26,
+                    pos: tputil::Point2D::new(15.0, 4.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 27 }])
+                },
+                Space {
+                    id: 27,
+                    pos: tputil::Point2D::new(18.0, 7.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 25 }])
+                },
+                Space {
+                    id: 28,
+                    pos: tputil::Point2D::new(22.0, 11.0),
+                    space_type: SpaceType::Negative,
+                    transitions: Box::new([SpaceTransition { to: 29 }])
+                },
+                Space {
+                    id: 29,
+                    pos: tputil::Point2D::new(22.0, 15.0),
+                    space_type: SpaceType::Positive,
+                    transitions: Box::new([SpaceTransition { to: 0 }])
+                },
             ]
         };
     }

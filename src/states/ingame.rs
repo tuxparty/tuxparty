@@ -21,6 +21,11 @@ pub struct GameInfo {
     pub map: board::Board,
 }
 
+const BOARD_CENTER: tputil::Point2D = tputil::Point2D {
+    x: 0.5,
+    y: 0.5
+};
+
 impl GameInfo {
     pub fn new<I>(players: I, map: board::Board) -> GameInfo
     where
@@ -145,8 +150,8 @@ impl game::State for BoardMoveState {
         let transform = self.game.render(
             gl,
             trans,
-            tputil::Point2D::ZERO,
-            0.15,
+            BOARD_CENTER,
+            0.06,
             &app.number_renderer,
             &[self.turn],
         );
@@ -230,8 +235,8 @@ impl game::State for SpaceResultState {
         let transform = self.game.render(
             gl,
             trans,
-            tputil::Point2D::ZERO,
-            0.15,
+            BOARD_CENTER,
+            0.06,
             &app.number_renderer,
             &[self.turn],
         );
@@ -311,8 +316,8 @@ impl game::State for DieRollState {
         let transform = self.game.render(
             gl,
             trans,
-            tputil::Point2D::ZERO,
-            0.15,
+            BOARD_CENTER,
+            0.06,
             &app.number_renderer,
             &[self.turn],
         );

@@ -15,7 +15,7 @@ use piston::input::{RenderEvent, UpdateEvent, PressEvent, ReleaseEvent};
 fn main() {
     let gl_version = opengl_graphics::OpenGL::V3_2;
 
-    let mut window: Window = piston::window::WindowSettings::new("Tuxparty", [800, 600])
+    let mut window: Window = piston::window::WindowSettings::new("Tuxparty", [600, 600])
         .opengl(gl_version)
         .exit_on_esc(true)
         .srgb(false)

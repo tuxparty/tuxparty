@@ -171,9 +171,9 @@ impl game::State for BoardMoveState {
         );
         app.number_renderer.draw_digit(
             self.remaining as usize,
-            0.8,
+            1.0,
             tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
-            transform.trans(pos.x, pos.y - 2.0),
+            transform.trans(pos.x, pos.y - 1.0),
             gl,
         );
     }
@@ -357,11 +357,16 @@ impl game::State for DieRollState {
             transform,
             gl,
         );
+        let off = if self.jump && self.time > 1.0 {
+            1.0 + y
+        } else {
+            2.0
+        };
         app.number_renderer.draw_digit(
             self.number as usize,
-            0.8,
+            1.0,
             tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
-            transform.trans(space.pos.x, space.pos.y - 2.0),
+            transform.trans(space.pos.x, space.pos.y - off),
             gl,
         );
     }
@@ -482,9 +487,9 @@ impl game::State for TransitionChoiceState {
         }
         app.number_renderer.draw_digit(
             self.remaining as usize,
-            0.8,
+            1.0,
             tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
-            transform.trans(space.pos.x, space.pos.y - 2.0),
+            transform.trans(space.pos.x, space.pos.y - 1.0),
             gl,
         );
     }

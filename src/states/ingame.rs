@@ -400,37 +400,43 @@ impl game::State for TransitionChoiceState {
                 self.remaining,
             ));
         } else {
-            let user_angle = app.input
-                .get_axis(
-                    &self.game.players[self.turn].player.input,
-                    tputil::Axis::LeftStickY,
-                )
-                .atan2(app.input.get_axis(
-                    &self.game.players[self.turn].player.input,
-                    tputil::Axis::LeftStickX,
-                )) as f64;
-            let space = self.game
-                .map
-                .get_space(self.game.players[self.turn].space)
-                .unwrap();
-            self.selected = space
-                .transitions
-                .into_iter()
-                .enumerate()
-                .map(|(idx, transition)| {
-                    let pos = self.game.map.get_space(transition.to).unwrap().pos;
-                    let displacement = pos - space.pos;
-                    let angle = displacement.y.atan2(displacement.x);
-                    (idx, (user_angle - angle + PI) % (2.0 * PI) - PI)
-                })
-                .fold((0, std::f64::INFINITY), |(min_idx, min), (idx, current)| {
-                    if min > current {
-                        (idx, current)
-                    }
-                    else {
-                        (min_idx, min)
-                    }
-                }).0;
+            let input_x = app.input.get_axis(
+                &self.game.players[self.turn].player.input,
+                tputil::Axis::LeftStickX,
+            );
+            let input_y = -app.input.get_axis(
+                &self.game.players[self.turn].player.input,
+                tputil::Axis::LeftStickY,
+            );
+            if input_x.abs() > 0.5 || input_y.abs() > 0.5 {
+                let user_angle = input_y.atan2(input_x) as f64;
+                println!("user_angle {}", user_angle);
+                let space = self.game
+                    .map
+                    .get_space(self.game.players[self.turn].space)
+                    .unwrap();
+                let closest = space
+                    .transitions
+                    .into_iter()
+                    .enumerate()
+                    .map(|(idx, transition)| {
+                        let pos = self.game.map.get_space(transition.to).unwrap().pos;
+                        let displacement = pos - space.pos;
+                        let angle = displacement.y.atan2(displacement.x);
+                        let tr = (idx, ((user_angle - angle + PI) % (2.0 * PI) - PI).abs());
+                        println!("{} {}", displacement, tr.1);
+                        tr
+                    })
+                    .fold((0, std::f64::INFINITY), |(min_idx, min), (idx, current)| {
+                        if min > current {
+                            (idx, current)
+                        } else {
+                            (min_idx, min)
+                        }
+                    });
+                self.selected = closest.0;
+                println!("{} {}", closest.0, closest.1);
+            }
         }
     }
     fn render(

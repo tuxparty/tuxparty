@@ -51,6 +51,12 @@ impl std::ops::Add for Point2D {
     }
 }
 
+impl std::fmt::Display for Point2D {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "({}, {})", self.x, self.y)
+    }
+}
+
 impl Point2D {
     pub fn translate(&self, transform: graphics::math::Matrix2d) -> graphics::math::Matrix2d {
         return transform.trans(self.x, self.y);

@@ -425,16 +425,20 @@ impl Minigame for MGSnake {
                         .get_axis(&snake.player.input, tputil::Axis::LeftStickX);
                     if axis < -0.4 {
                         snake.direction = Direction::West;
+                        snake.turned = true;
                     } else if axis > 0.4 {
                         snake.direction = Direction::East;
+                        snake.turned = true;
                     }
                 } else if snake.direction == Direction::West || snake.direction == Direction::East {
                     let axis = app.input
                         .get_axis(&snake.player.input, tputil::Axis::LeftStickY);
                     if axis < -0.4 {
                         snake.direction = Direction::South;
+                        snake.turned = true;
                     } else if axis > 0.4 {
                         snake.direction = Direction::North;
+                        snake.turned = true;
                     }
                 }
             }

@@ -13,7 +13,7 @@ use sdl2_window::Sdl2Window as Window;
 use piston::input::{RenderEvent, UpdateEvent, PressEvent, ReleaseEvent};
 
 fn main() {
-    let gl_version = opengl_graphics::OpenGL::V3_2;
+    let gl_version = opengl_graphics::OpenGL::V2_1;
 
     let mut window: Window = piston::window::WindowSettings::new("Tuxparty", [600, 600])
         .opengl(gl_version)

@@ -52,7 +52,8 @@ impl From<JoinStatePlayer> for states::ingame::PlayerInfo {
         return states::ingame::PlayerInfo {
             player: player.player,
             space: 0,
-            coins: 0
+            coins: 0,
+            stars: 0
         };
     }
 }

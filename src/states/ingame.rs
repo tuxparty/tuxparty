@@ -6,21 +6,25 @@ use states;
 use graphics;
 use opengl_graphics;
 use std;
+use rand;
 
 use graphics::Transformed;
 use std::f64::consts::PI;
+use rand::Rng;
 
 #[derive(Clone, Copy)]
 pub struct PlayerInfo {
     pub player: tputil::Player,
     pub space: board::SpaceID,
-    pub coins: u32,
+    pub coins: u16,
+    pub stars: u8,
 }
 
 #[derive(Clone)]
 pub struct GameInfo {
     pub players: Vec<PlayerInfo>,
     pub map: board::Board,
+    pub star_space: board::SpaceID,
 }
 
 const BOARD_CENTER: tputil::Point2D = tputil::Point2D { x: 0.5, y: 0.5 };
@@ -30,10 +34,16 @@ impl GameInfo {
     where
         I: IntoIterator<Item = PlayerInfo>,
     {
+        let star_space = GameInfo::choose_star_space(&map);
         return GameInfo {
             players: players.into_iter().collect(),
             map: map,
+            star_space: star_space,
         };
+    }
+
+    fn choose_star_space(map: &board::Board) -> board::SpaceID {
+        map.spaces[rand::thread_rng().gen_range(0, map.spaces.len())].id
     }
 
     fn render(
@@ -47,13 +57,18 @@ impl GameInfo {
     ) -> graphics::math::Matrix2d {
         const COLOR1: [f32; 4] = [1.0, 0.2, 0.0, 1.0];
         const COLOR2: [f32; 4] = [0.0, 0.8, 1.0, 1.0];
+        const COLOR3: [f32; 4] = [1.0, 0.8, 0.0, 1.0];
 
         let transform = (-center).translate(trans).scale(scale, scale);
         for space in &self.map.spaces {
             graphics::rectangle(
-                match space.space_type {
-                    board::SpaceType::Positive => COLOR2,
-                    board::SpaceType::Negative => COLOR1,
+                if space.id == self.star_space {
+                    COLOR3
+                } else {
+                    match space.space_type {
+                        board::SpaceType::Positive => COLOR2,
+                        board::SpaceType::Negative => COLOR1,
+                    }
                 },
                 graphics::rectangle::centered_square(space.pos.x, space.pos.y, 1.0),
                 transform,
@@ -80,15 +95,20 @@ impl GameInfo {
         }
         for i in 0..self.players.len().min(4) {
             let coins = format!("{}", self.players[i].coins);
+            let stars = format!("{}", self.players[i].stars);
             let size = 0.4;
+            let text_size = size / 3.0;
             let mut x = -1.0;
-            let mut text_x;
+            let mut coin_text_x;
+            let mut star_text_x;
             let mut y = -1.0;
             if i == 1 || i == 3 {
                 x = 1.0 - size;
-                text_x = -number_renderer.get_str_width(&coins, size) + size / 3.0;
+                coin_text_x = -number_renderer.get_str_width(&coins, text_size) + size / 3.0;
+                star_text_x = -number_renderer.get_str_width(&stars, text_size) + size / 3.0;
             } else {
-                text_x = size * 2.0 / 3.0;
+                coin_text_x = size * 2.0 / 3.0;
+                star_text_x = size * 2.0 / 3.0;
             }
 
             if i == 2 || i == 3 {
@@ -103,7 +123,8 @@ impl GameInfo {
                 trans,
                 gl,
             );
-            number_renderer.draw_str(&coins, size, trans.trans(x + text_x, y), gl);
+            number_renderer.draw_str(&coins, text_size, trans.trans(x + coin_text_x, y + text_size / 2.0), gl);
+            number_renderer.draw_str(&stars, text_size, trans.trans(x + star_text_x, y + text_size * 1.5), gl);
         }
         return transform;
     }
@@ -189,6 +210,14 @@ impl game::State for BoardMoveState {
             let mut new_game_state = self.game.clone();
             new_game_state.players[self.turn].space = transition.to;
 
+            if transition.to == self.game.star_space {
+                if self.game.players[self.turn].coins >= 20 {
+                    new_game_state.players[self.turn].coins -= 20;
+                    new_game_state.players[self.turn].stars += 1;
+                    new_game_state.star_space = GameInfo::choose_star_space(&self.game.map);
+                }
+            }
+
             if self.remaining > 1 {
                 let end = self.game.map.get_space(transition.to).unwrap();
                 if end.transitions.len() > 1 {
@@ -217,7 +246,7 @@ impl game::State for BoardMoveState {
                         board::SpaceType::Positive => 3,
                         board::SpaceType::Negative => -(3 as i8),
                     } as i64)
-                    .max(0) as u32;
+                    .max(0) as u16;
                 app.goto_state(SpaceResultState {
                     game: new_game_state,
                     time: 0.0,

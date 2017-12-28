@@ -105,6 +105,43 @@ pub struct Player {
     pub color: usize
 }
 
+pub struct Alignment(pub AlignmentX, pub AlignmentY);
+
+impl Alignment {
+    pub const TOP_LEFT: Alignment = Alignment(AlignmentX::Left, AlignmentY::Top);
+    fn get_offset_x(&self, width: f64) -> f64 {
+        match self.0 {
+            AlignmentX::Left => 0.0,
+            AlignmentX::Center => -width/2.0,
+            AlignmentX::Right => -width
+        }
+    }
+    fn get_offset_y(&self, height: f64) -> f64 {
+        match self.1 {
+            AlignmentY::Top => 0.0,
+            AlignmentY::Middle => -height/2.0,
+            AlignmentY::Bottom => -height
+        }
+    }
+    fn get_offset(&self, width: f64, height: f64) -> Point2D {
+        Point2D::new(self.get_offset_x(width), self.get_offset_y(height))
+    }
+    pub fn align(&self, matrix: graphics::math::Matrix2d, width: f64, height: f64) -> graphics::math::Matrix2d {
+        let offset = self.get_offset(width, height);
+        matrix.trans(offset.x, offset.y)
+    }
+}
+
+pub enum AlignmentX {
+    Left, Center, Right
+}
+
+pub enum AlignmentY {
+    Top,
+    Middle,
+    Bottom
+}
+
 pub struct InputState {
     backend: gilrs::Gilrs,
     keyboard_state: std::collections::HashMap<piston::input::Key, bool>,

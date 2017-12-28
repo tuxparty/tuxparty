@@ -171,7 +171,8 @@ impl game::State for BoardMoveState {
         );
         app.number_renderer.draw_digit(
             self.remaining as usize,
-            0.4,
+            0.8,
+            tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
             transform.trans(pos.x, pos.y - 2.0),
             gl,
         );
@@ -358,7 +359,8 @@ impl game::State for DieRollState {
         );
         app.number_renderer.draw_digit(
             self.number as usize,
-            0.4,
+            0.8,
+            tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
             transform.trans(space.pos.x, space.pos.y - 2.0),
             gl,
         );

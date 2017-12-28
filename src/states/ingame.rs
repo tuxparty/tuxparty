@@ -480,5 +480,12 @@ impl game::State for TransitionChoiceState {
             graphics::line(COLOR2, 0.2, [p1.x, p1.y, p2.x, p2.y], transform, gl);
             graphics::line(color, 0.15, [p1.x, p1.y, p2.x, p2.y], transform, gl);
         }
+        app.number_renderer.draw_digit(
+            self.remaining as usize,
+            0.8,
+            tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
+            transform.trans(space.pos.x, space.pos.y - 2.0),
+            gl,
+        );
     }
 }

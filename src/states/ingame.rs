@@ -58,8 +58,15 @@ impl GameInfo {
         const COLOR1: [f32; 4] = [1.0, 0.2, 0.0, 1.0];
         const COLOR2: [f32; 4] = [0.0, 0.8, 1.0, 1.0];
         const COLOR3: [f32; 4] = [1.0, 0.8, 0.0, 1.0];
+        const COLOR4: [f32; 4] = [0.8, 0.7, 0.6, 1.0];
 
         let transform = (-center).translate(trans).scale(scale, scale);
+        for start in &self.map.spaces {
+            for transition in start.transitions.into_iter() {
+                let end = self.map.get_space(transition.to).unwrap();
+                graphics::line(COLOR4, 0.2, [start.pos.x, start.pos.y, end.pos.x, end.pos.y], transform, gl);
+            }
+        }
         for space in &self.map.spaces {
             graphics::rectangle(
                 if space.id == self.star_space {

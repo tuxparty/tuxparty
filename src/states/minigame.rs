@@ -19,9 +19,9 @@ impl game::State for MinigameState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        _: &game::App,
+        app: &game::App,
     ) {
-        self.minigame.render(gl, trans);
+        self.minigame.render(gl, trans, app);
     }
     fn update(&mut self, app: &mut game::App, time: f64) {
         let result = self.minigame.update(app, time);
@@ -121,7 +121,7 @@ impl game::State for MinigameResultState {
 }
 
 trait Minigame {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d);
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, app: &game::App);
     fn update(&mut self, app: &game::App, time: f64) -> Option<usize>;
 }
 
@@ -154,7 +154,7 @@ impl MGQuickdraw {
 }
 
 impl Minigame for MGQuickdraw {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _app: &game::App) {
         let buzzer_color;
         const COLOR1: graphics::types::Color = [1.0, 0.0, 0.0, 1.0];
         const COLOR2: graphics::types::Color = [0.0, 1.0, 0.0, 1.0];
@@ -257,7 +257,7 @@ impl MGHotRope {
 
 
 impl Minigame for MGHotRope {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _app: &game::App) {
         let scale = 1.0 / self.players.len() as f64;
         let rope_y = 1.0 - self.rope_time;
         const COLOR1: [f32; 4] = [1.0, 0.5, 0.0, 1.0];
@@ -385,7 +385,7 @@ impl MGSnake {
 }
 
 impl Minigame for MGSnake {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _app: &game::App) {
         const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         graphics::rectangle(
             COLOR1,
@@ -650,7 +650,7 @@ impl Minigame for MGCastleClimb {
         }
         return None;
     }
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _app: &game::App) {
         const COLOR1: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
         for block in &self.blocks {
             graphics::rectangle(
@@ -741,7 +741,7 @@ impl MGItemCatch {
 }
 
 impl Minigame for MGItemCatch {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, app: &game::App) {
         const COLOR1: graphics::types::Color = [0.7, 0.7, 0.7, 1.0];
         const COLOR2: graphics::types::Color = [1.0, 0.8, 0.0, 1.0];
         const COLOR3: graphics::types::Color = [1.0, 0.0, 0.0, 1.0];
@@ -772,7 +772,9 @@ impl Minigame for MGItemCatch {
                 gl,
             );
         }
-        let time_left = (MGItemCatch::TIME_LIMIT - self.time).ceil();
+        let time_left = (MGItemCatch::TIME_LIMIT - self.time).ceil() as i8;
+        let time_str = format!("{:02}", time_left);
+        app.number_renderer.draw_str(&time_str, 0.3, trans.trans(-(0.3*5.0/7.0), -1.0), gl);
     }
     fn update(&mut self, app: &game::App, time: f64) -> Option<usize> {
         self.time += time;

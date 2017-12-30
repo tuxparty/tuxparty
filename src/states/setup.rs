@@ -21,7 +21,7 @@ impl game::State for MenuState {
             gl,
         );
     }
-    fn update(&mut self, app: &mut game::App, time: f64) {
+    fn update(&mut self, app: &mut game::App, _time: f64) {
         let pressed = app.input.get_pressed_any(tputil::Button::South);
         if pressed.len() > 0 {
             app.goto_state(JoinState::new());

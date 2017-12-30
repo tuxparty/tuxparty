@@ -6,7 +6,6 @@ use graphics;
 use rand;
 use tputil;
 use states;
-use std;
 
 use rand::Rng;
 use graphics::Transformed;
@@ -122,7 +121,7 @@ impl game::State for MinigameResultState {
     }
 }
 
-trait Minigame {
+pub trait Minigame {
     fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, app: &game::App);
     fn update(&mut self, app: &game::App, time: f64) -> Option<usize>;
 }

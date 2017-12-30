@@ -109,7 +109,7 @@ impl states::minigame::Minigame for MGItemCatch {
     fn update(&mut self, app: &game::App, time: f64) -> Option<usize> {
         self.time += time;
         if self.time > MGItemCatch::TIME_LIMIT {
-            return Some(self.players.iter().enumerate().max_by_key(|&(i,x)|x.points).unwrap().0);
+            return Some(self.players.iter().enumerate().max_by_key(|&(_,x)|x.points).unwrap().0);
         }
         for player in self.players.iter_mut() {
             player.velocity.x = app.input

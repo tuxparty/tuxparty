@@ -56,8 +56,8 @@ impl MinigameState {
         ]);
         return MinigameState {
             game: game,
-            //minigame: games_list[rand::thread_rng().gen_range(0, games_list.len())](slice),
-            minigame: games_list[4](slice),
+            minigame: games_list[rand::thread_rng().gen_range(0, games_list.len())](slice),
+            //minigame: games_list[4](slice),
         };
     }
 }

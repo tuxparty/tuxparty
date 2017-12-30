@@ -51,6 +51,13 @@ impl std::ops::Add for Point2D {
     }
 }
 
+impl std::ops::AddAssign for Point2D {
+    fn add_assign(&mut self, rhs: Point2D) {
+        self.x += rhs.x;
+        self.y += rhs.y;
+    }
+}
+
 impl std::fmt::Display for Point2D {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "({}, {})", self.x, self.y)

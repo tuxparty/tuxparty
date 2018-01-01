@@ -166,7 +166,7 @@ impl states::minigame::Minigame for MGItemCatch {
             let index = to_remove - i;
             self.items.remove(index);
         }
-        let chance = 0.7 * time;
+        let chance = 1.0 * time;
         if rand::thread_rng().next_f64() < chance {
             let side = if rand::thread_rng().gen() { 1 } else { -1 };
             let start_vel = tputil::Point2D::new(

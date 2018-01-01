@@ -7,6 +7,7 @@ use states;
 use game;
 
 use rand::Rng;
+use states::minigame::MinigameResult;
 
 struct CCPlayer {
     player: tputil::Player,
@@ -49,7 +50,7 @@ impl MGCastleClimb {
 }
 
 impl states::minigame::Minigame for MGCastleClimb {
-    fn update(&mut self, app: &game::App, time: f64) -> Option<usize> {
+    fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
         self.time += time;
         let diff = tputil::Point2D::new(0.0, time * ((-1.0 / (self.time / 50.0 + 1.1)) + 1.0));
         self.blocks = self.blocks
@@ -95,8 +96,8 @@ impl states::minigame::Minigame for MGCastleClimb {
         }
         if !multiple_alive {
             return match last_alive {
-                Some(index) => Some(index),
-                _ => Some(999),
+                Some(index) => Some(MinigameResult::Winner(index)),
+                _ => Some(MinigameResult::Nothing),
             };
         }
         let mut last = self.blocks[self.blocks.len() - 1];

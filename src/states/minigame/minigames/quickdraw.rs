@@ -9,6 +9,7 @@ use game;
 
 use graphics::Transformed;
 use rand::Rng;
+use states::minigame::MinigameResult;
 
 pub struct MGQuickdraw {
     players: Box<[tputil::Player]>,
@@ -80,7 +81,7 @@ impl states::minigame::Minigame for MGQuickdraw {
             );
         }
     }
-    fn update(&mut self, app: &game::App, time: f64) -> Option<usize> {
+    fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
         self.time += time;
         let mut all_dead = true;
         for i in 0..self.players.len() {
@@ -91,7 +92,7 @@ impl states::minigame::Minigame for MGQuickdraw {
                     if self.time < self.buzz_time {
                         self.player_buzzes[i] = self.time;
                     } else {
-                        return Some(i);
+                        return Some(MinigameResult::Winner(i));
                     }
                 } else {
                     all_dead = false;
@@ -99,7 +100,7 @@ impl states::minigame::Minigame for MGQuickdraw {
             }
         }
         if all_dead {
-            return Some(999); // TODO replace this number with something meaningful
+            return Some(MinigameResult::Nothing);
         }
         return None;
     }

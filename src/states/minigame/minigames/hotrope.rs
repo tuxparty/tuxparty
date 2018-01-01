@@ -8,6 +8,7 @@ use states;
 use game;
 
 use rand::Rng;
+use states::minigame::MinigameResult;
 
 pub struct MGHotRope {
     players: Box<[tputil::Player]>,
@@ -72,7 +73,7 @@ impl states::minigame::Minigame for MGHotRope {
             );
         }
     }
-    fn update(&mut self, app: &game::App, time: f64) -> Option<usize> {
+    fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
         self.time += time;
         self.rope_time += time * self.speed;
         let mut last_alive: i8 = -1;
@@ -110,8 +111,8 @@ impl states::minigame::Minigame for MGHotRope {
             return None;
         }
         if last_alive < 0 {
-            return Some(999);
+            return Some(MinigameResult::Nothing);
         }
-        return Some(last_alive as usize);
+        return Some(MinigameResult::Winner(last_alive as usize));
     }
 }

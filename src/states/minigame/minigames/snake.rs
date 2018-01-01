@@ -8,6 +8,7 @@ use game;
 
 use graphics::Transformed;
 use rand::Rng;
+use states::minigame::MinigameResult;
 
 #[derive(Eq, PartialEq)]
 enum Direction {
@@ -98,7 +99,7 @@ impl states::minigame::Minigame for MGSnake {
             }
         }
     }
-    fn update(&mut self, app: &game::App, time: f64) -> Option<usize> {
+    fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
         self.unhandled_time += time;
 
         for snake in self.snakes.iter_mut() {
@@ -216,9 +217,9 @@ impl states::minigame::Minigame for MGSnake {
                 return None;
             }
             if last_alive < 0 {
-                return Some(999);
+                return Some(MinigameResult::Nothing);
             }
-            return Some(last_alive as usize);
+            return Some(MinigameResult::Winner(last_alive as usize));
         }
         return None;
     }

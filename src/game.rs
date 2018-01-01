@@ -48,7 +48,7 @@ pub trait State {
 }
 
 pub struct NumberRenderer {
-    digits: [opengl_graphics::Texture; 10],
+    glyphs: [opengl_graphics::Texture; 11],
 }
 
 macro_rules! load_number {
@@ -63,7 +63,7 @@ macro_rules! load_number {
 impl NumberRenderer {
     pub fn new() -> NumberRenderer {
         return NumberRenderer {
-            digits: [
+            glyphs: [
                 load_number!("../assets/art/numbers/0.png"),
                 load_number!("../assets/art/numbers/1.png"),
                 load_number!("../assets/art/numbers/2.png"),
@@ -73,7 +73,8 @@ impl NumberRenderer {
                 load_number!("../assets/art/numbers/6.png"),
                 load_number!("../assets/art/numbers/7.png"),
                 load_number!("../assets/art/numbers/8.png"),
-                load_number!("../assets/art/numbers/9.png")
+                load_number!("../assets/art/numbers/9.png"),
+                load_number!("../assets/art/numbers/-.png")
             ],
         };
     }
@@ -84,13 +85,16 @@ impl NumberRenderer {
 
     pub fn draw_str(&self, string: &str, size: f64, transform: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
         for (i, c) in string.char_indices() {
-            let digit_index = c.to_digit(10).unwrap_or(0) as usize;
+            let digit_index = match c {
+                '-' => 10,
+                _ => c.to_digit(10).unwrap_or(0) as usize
+            };
             self.draw_digit(digit_index, size, tputil::Alignment::TOP_LEFT, transform.trans(100.0 * i as f64 * size / 140.0, 0.0), gl);
         }
     }
 
     pub fn draw_digit(&self, digit_index: usize, size: f64, alignment: tputil::Alignment, transform: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
-        let digit = &self.digits[digit_index];
+        let digit = &self.glyphs[digit_index];
         let scale = size / 140.0;
         graphics::image(digit, alignment.align(transform.scale(scale, scale), 5.0*140.0/7.0, 140.0), gl);
     }

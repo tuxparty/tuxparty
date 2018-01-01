@@ -9,6 +9,7 @@ use game;
 
 use rand::Rng;
 use graphics::Transformed;
+use states::minigame::MinigameResult;
 
 struct ICPlayer {
     player: tputil::Player,
@@ -71,7 +72,12 @@ impl MGItemCatch {
 }
 
 impl states::minigame::Minigame for MGItemCatch {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, app: &game::App) {
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        app: &game::App,
+    ) {
         const COLOR1: graphics::types::Color = [0.7, 0.7, 0.7, 1.0];
         const COLOR2: graphics::types::Color = [1.0, 0.8, 0.0, 1.0];
         const COLOR3: graphics::types::Color = [1.0, 0.0, 0.0, 1.0];
@@ -104,12 +110,19 @@ impl states::minigame::Minigame for MGItemCatch {
         }
         let time_left = (MGItemCatch::TIME_LIMIT - self.time).ceil() as i8;
         let time_str = format!("{:02}", time_left);
-        app.number_renderer.draw_str(&time_str, 0.3, trans.trans(-(0.3*5.0/7.0), -1.0), gl);
+        app.number_renderer
+            .draw_str(&time_str, 0.3, trans.trans(-(0.3 * 5.0 / 7.0), -1.0), gl);
     }
-    fn update(&mut self, app: &game::App, time: f64) -> Option<usize> {
+    fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
         self.time += time;
         if self.time > MGItemCatch::TIME_LIMIT {
-            return Some(self.players.iter().enumerate().max_by_key(|&(_,x)|x.points).unwrap().0);
+            return Some(MinigameResult::Ratios(
+                self.players
+                    .iter()
+                    .map(|x| x.points as f64)
+                    .collect::<std::vec::Vec<f64>>()
+                    .into_boxed_slice(),
+            ));
         }
         for player in self.players.iter_mut() {
             player.velocity.x = app.input
@@ -138,8 +151,11 @@ impl states::minigame::Minigame for MGItemCatch {
             let pos = item.get_pos(self.time);
             let rad = item.get_radius();
             for player in self.players.iter_mut() {
-                if pos.x + rad > player.position.x - MGItemCatch::PLAYER_RADIUS && pos.x - rad < player.position.x + MGItemCatch::PLAYER_RADIUS
-                && pos.y + rad > player.position.y - MGItemCatch::PLAYER_RADIUS && pos.y - rad < player.position.y + MGItemCatch::PLAYER_RADIUS {
+                if pos.x + rad > player.position.x - MGItemCatch::PLAYER_RADIUS
+                    && pos.x - rad < player.position.x + MGItemCatch::PLAYER_RADIUS
+                    && pos.y + rad > player.position.y - MGItemCatch::PLAYER_RADIUS
+                    && pos.y - rad < player.position.y + MGItemCatch::PLAYER_RADIUS
+                {
                     removed_items.push(index);
                     player.points += item.value;
                     break;

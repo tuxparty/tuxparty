@@ -20,14 +20,11 @@ pub struct MGQuickdraw {
 
 impl MGQuickdraw {
     pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
-        return Box::new(MGQuickdraw::new(players));
+        Box::new(MGQuickdraw::new(players))
     }
     fn new(players: Box<[tputil::Player]>) -> MGQuickdraw {
-        let count;
-        {
-            count = players.len();
-        }
-        return MGQuickdraw {
+        let count = players.len();
+        MGQuickdraw {
             players: players,
             player_buzzes: std::iter::repeat(-1.0)
                 .take(count)
@@ -35,7 +32,7 @@ impl MGQuickdraw {
                 .into_boxed_slice(),
             buzz_time: rand::thread_rng().gen_range(1.0, 10.0),
             time: 0.0,
-        };
+        }
     }
 }
 
@@ -98,8 +95,10 @@ impl states::minigame::Minigame for MGQuickdraw {
             }
         }
         if all_dead {
-            return Some(MinigameResult::Nothing);
+            Some(MinigameResult::Nothing)
         }
-        return None;
+        else {
+            None
+        }
     }
 }

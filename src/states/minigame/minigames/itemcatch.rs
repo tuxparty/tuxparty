@@ -45,7 +45,7 @@ pub struct MGItemCatch {
 
 impl MGItemCatch {
     pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
-        return Box::new(MGItemCatch::new(&players));
+        Box::new(MGItemCatch::new(&players))
     }
     fn new(players: &[tputil::Player]) -> Self {
         MGItemCatch {

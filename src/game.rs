@@ -61,8 +61,8 @@ macro_rules! load_number {
 }
 
 impl NumberRenderer {
-    pub fn new() -> NumberRenderer {
-        return NumberRenderer {
+    pub fn new() -> Self {
+        NumberRenderer {
             glyphs: [
                 load_number!("../assets/art/numbers/0.png"),
                 load_number!("../assets/art/numbers/1.png"),
@@ -76,11 +76,11 @@ impl NumberRenderer {
                 load_number!("../assets/art/numbers/9.png"),
                 load_number!("../assets/art/numbers/-.png")
             ],
-        };
+        }
     }
 
     pub fn get_str_width(&self, string: &str, size: f64) -> f64 {
-        return size * 5.0 * string.chars().count() as f64 / 7.0;
+        size * 5.0 * string.chars().count() as f64 / 7.0
     }
 
     pub fn draw_str(&self, string: &str, size: f64, transform: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {

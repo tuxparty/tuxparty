@@ -23,31 +23,31 @@ pub struct Point2D {
 
 impl std::ops::Neg for Point2D {
     type Output = Point2D;
-    fn neg(self) -> Point2D {
-        return Point2D {
+    fn neg(self) -> Self {
+        Point2D {
             x: -self.x,
             y: -self.y,
-        };
+        }
     }
 }
 
 impl std::ops::Sub for Point2D {
     type Output = Point2D;
-    fn sub(self, rhs: Point2D) -> Point2D {
-        return Point2D {
+    fn sub(self, rhs: Point2D) -> Self::Output {
+        Point2D {
             x: self.x - rhs.x,
             y: self.y - rhs.y
-        };
+        }
     }
 }
 
 impl std::ops::Add for Point2D {
     type Output = Point2D;
-    fn add(self, rhs: Point2D) -> Point2D {
-        return Point2D {
+    fn add(self, rhs: Point2D) -> Self::Output {
+        Point2D {
             x: self.x + rhs.x,
             y: self.y + rhs.y
-        };
+        }
     }
 }
 
@@ -66,25 +66,25 @@ impl std::fmt::Display for Point2D {
 
 impl Point2D {
     pub fn translate(&self, transform: graphics::math::Matrix2d) -> graphics::math::Matrix2d {
-        return transform.trans(self.x, self.y);
+        transform.trans(self.x, self.y)
     }
-    pub fn multiply_scalar(&self, a: f64) -> Point2D {
-        return Point2D {
+    pub fn multiply_scalar(&self, a: f64) -> Self {
+        Point2D {
             x: self.x * a,
             y: self.y * a
-        };
+        }
     }
-    pub fn new(x: f64, y: f64) -> Point2D {
-        return Point2D { x: x, y: y };
+    pub fn new(x: f64, y: f64) -> Self {
+        Point2D { x, y }
     }
-    pub fn lerp(a: Point2D, b: Point2D, t: f64) -> Point2D {
-        return Point2D {
+    pub fn lerp(a: Point2D, b: Point2D, t: f64) -> Self {
+        Point2D {
             x: (b.x - a.x) * t + a.x,
             y: (b.y - a.y) * t + a.y,
-        };
+        }
     }
     pub fn dist(a: Point2D, b: Point2D) -> f64 {
-        return ((b.x - a.x).powf(2.0) + (b.y - a.y).powf(2.0)).sqrt();
+        ((b.x - a.x).powf(2.0) + (b.y - a.y).powf(2.0)).sqrt()
     }
     pub const ZERO: Point2D = Point2D { x: 0.0, y: 0.0 };
 }
@@ -155,41 +155,43 @@ pub struct InputState {
 }
 
 impl InputState {
-    pub fn new() -> InputState {
-        return InputState {
+    pub fn new() -> Self {
+        InputState {
             backend: gilrs::Gilrs::new(),
             keyboard_state: std::collections::HashMap::new(),
-        };
+        }
     }
 
     pub fn get_axis(&self, ctl: &InputMethod, axis: Axis) -> f32 {
         match ctl.input_type {
             InputType::Gamepad => {
                 if self.backend[ctl.id].status() == gilrs::Status::Disconnected {
-                    return 0.0;
+                    0.0
                 }
-                return self.backend[ctl.id].value(axis);
+                else {
+                    self.backend[ctl.id].value(axis)
+                }
             }
             InputType::Keyboard => match axis {
                 Axis::LeftStickX => {
-                    return (match self.keyboard_state.get(&piston::input::Key::Left) {
+                    (match self.keyboard_state.get(&piston::input::Key::Left) {
                         Some(_) => -1.0,
                         _ => 0.0,
-                    })
-                        + match self.keyboard_state.get(&piston::input::Key::Right) {
-                            Some(_) => 1.0,
-                            _ => 0.0,
-                        }
-                }
-                Axis::LeftStickY => {
-                    return (match self.keyboard_state.get(&piston::input::Key::Up) {
+                    }
+                    + match self.keyboard_state.get(&piston::input::Key::Right) {
                         Some(_) => 1.0,
                         _ => 0.0,
                     })
-                        + match self.keyboard_state.get(&piston::input::Key::Down) {
-                            Some(_) => -1.0,
-                            _ => 0.0,
-                        }
+                }
+                Axis::LeftStickY => {
+                    (match self.keyboard_state.get(&piston::input::Key::Up) {
+                        Some(_) => 1.0,
+                        _ => 0.0,
+                    }
+                    + match self.keyboard_state.get(&piston::input::Key::Down) {
+                        Some(_) => -1.0,
+                        _ => 0.0,
+                    })
                 }
                 _ => 0.0,
             },
@@ -214,7 +216,7 @@ impl InputState {
     }
 
     pub fn is_key_pressed(&self, key: &piston::input::keyboard::Key) -> bool {
-        return self.keyboard_state.contains_key(key);
+        self.keyboard_state.contains_key(key)
     }
 
     pub fn get_pressed_any(&self, button: Button) -> Vec<InputMethod> {
@@ -231,7 +233,7 @@ impl InputState {
             results.push(KEYBOARD);
         }
         println!("get_pressed_any {}", results.len());
-        return results;
+        results
     }
 
     pub fn update(&mut self) {

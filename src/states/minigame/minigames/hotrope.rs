@@ -21,14 +21,11 @@ pub struct MGHotRope {
 
 impl MGHotRope {
     pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
-        return Box::new(MGHotRope::new(players));
+        Box::new(MGHotRope::new(players))
     }
-    pub fn new(players: Box<[tputil::Player]>) -> MGHotRope {
-        let count;
-        {
-            count = players.len();
-        }
-        return MGHotRope {
+    pub fn new(players: Box<[tputil::Player]>) -> Self {
+        let count = players.len();
+        MGHotRope {
             players: players,
             time: 0.0,
             rope_time: 10.0,
@@ -41,7 +38,7 @@ impl MGHotRope {
                 .collect::<Vec<f64>>()
                 .into_boxed_slice(),
             speed: 1.0,
-        };
+        }
     }
 }
 
@@ -53,12 +50,11 @@ impl states::minigame::Minigame for MGHotRope {
         const COLOR1: [f32; 4] = [1.0, 0.5, 0.0, 1.0];
         graphics::rectangle(COLOR1, [-1.0, rope_y, 2.0, 0.1], trans, gl);
         for i in 0..self.players.len() {
-            let y;
-            if self.swept_at[i] < 0.0 {
-                y = (((self.time - self.jumped_at[i]) * 4.0 - 1.0).powf(2.0) - 1.0).min(0.0) / 2.0;
+            let y = if self.swept_at[i] < 0.0 {
+                (((self.time - self.jumped_at[i]) * 4.0 - 1.0).powf(2.0) - 1.0).min(0.0) / 2.0
             } else {
-                y = (self.swept_at[i] - self.time) * self.speed;
-            }
+                (self.swept_at[i] - self.time) * self.speed
+            };
             let color = tputil::COLORS[self.players[i].color];
             graphics::rectangle(
                 color,
@@ -76,7 +72,7 @@ impl states::minigame::Minigame for MGHotRope {
     fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
         self.time += time;
         self.rope_time += time * self.speed;
-        let mut last_alive: i8 = -1;
+        let mut last_alive: Option<usize> = None;
         let mut more_than_one = false;
 
         let mut waiting = false;
@@ -84,10 +80,10 @@ impl states::minigame::Minigame for MGHotRope {
         for i in 0..self.players.len() {
             if self.swept_at[i] < 0.0 {
                 // not dead yet
-                if last_alive >= 0 {
+                if last_alive.is_some() {
                     more_than_one = true;
                 }
-                last_alive = i as i8;
+                last_alive = Some(i);
                 if self.jumped_at[i] < self.time - 0.5 {
                     if self.rope_time > 1.0 && self.rope_time < 1.2 {
                         self.swept_at[i] = self.time - (self.rope_time - 1.0) / self.speed;
@@ -110,9 +106,9 @@ impl states::minigame::Minigame for MGHotRope {
         if more_than_one || waiting {
             return None;
         }
-        if last_alive < 0 {
-            return Some(MinigameResult::Nothing);
+        match last_alive {
+            None => Some(MinigameResult::Nothing),
+            Some(winner) => Some(MinigameResult::Winner(winner))
         }
-        return Some(MinigameResult::Winner(last_alive as usize));
     }
 }

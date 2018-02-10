@@ -36,25 +36,25 @@ struct JoinStatePlayer {
 }
 
 impl JoinStatePlayer {
-    fn new(player: tputil::InputMethod, color: usize) -> JoinStatePlayer {
-        return JoinStatePlayer {
+    fn new(player: tputil::InputMethod, color: usize) -> Self {
+        JoinStatePlayer {
             rotation: 0.0,
             player: tputil::Player {
                 input: player,
                 color: color
             }
-        };
+        }
     }
 }
 
 impl From<JoinStatePlayer> for states::ingame::PlayerInfo {
-    fn from(player: JoinStatePlayer) -> states::ingame::PlayerInfo {
-        return states::ingame::PlayerInfo {
+    fn from(player: JoinStatePlayer) -> Self {
+        states::ingame::PlayerInfo {
             player: player.player,
             space: 0,
             coins: 0,
             stars: 0
-        };
+        }
     }
 }
 
@@ -63,10 +63,10 @@ pub struct JoinState {
 }
 
 impl JoinState {
-    fn new() -> JoinState {
-        return JoinState {
+    fn new() -> Self {
+        JoinState {
             players: Vec::new(),
-        };
+        }
     }
 }
 

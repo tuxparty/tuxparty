@@ -23,7 +23,7 @@ pub struct MGCastleClimb {
 
 impl MGCastleClimb {
     pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
-        return Box::new(MGCastleClimb {
+        Box::new(MGCastleClimb {
             blocks: vec![tputil::Point2D::ZERO],
             players: players
                 .iter()
@@ -37,7 +37,7 @@ impl MGCastleClimb {
                 .collect::<Vec<CCPlayer>>()
                 .into_boxed_slice(),
             time: 0.0,
-        });
+        })
     }
     const JUMP_VEL: f64 = 1.0;
     const HORIZ_VEL: f64 = 0.5;
@@ -115,7 +115,7 @@ impl states::minigame::Minigame for MGCastleClimb {
             last += tputil::Point2D::new(x, y);
             self.blocks.push(last);
         }
-        return None;
+        None
     }
     fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _app: &game::App) {
         const COLOR1: [f32; 4] = [1.0, 0.0, 0.0, 1.0];

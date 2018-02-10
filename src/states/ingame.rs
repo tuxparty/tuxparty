@@ -30,16 +30,16 @@ pub struct GameInfo {
 const BOARD_CENTER: tputil::Point2D = tputil::Point2D { x: 0.5, y: 0.5 };
 
 impl GameInfo {
-    pub fn new<I>(players: I, map: board::Board) -> GameInfo
+    pub fn new<I>(players: I, map: board::Board) -> Self
     where
         I: IntoIterator<Item = PlayerInfo>,
     {
         let star_space = GameInfo::choose_star_space(&map);
-        return GameInfo {
+        GameInfo {
             players: players.into_iter().collect(),
             map: map,
             star_space: star_space,
-        };
+        }
     }
 
     fn choose_star_space(map: &board::Board) -> board::SpaceID {
@@ -133,7 +133,7 @@ impl GameInfo {
             number_renderer.draw_str(&coins, text_size, trans.trans(x + coin_text_x, y + text_size / 2.0), gl);
             number_renderer.draw_str(&stars, text_size, trans.trans(x + star_text_x, y + text_size * 1.5), gl);
         }
-        return transform;
+        transform
     }
 }
 
@@ -147,23 +147,22 @@ pub struct BoardMoveState {
 }
 
 impl BoardMoveState {
-    pub fn new(info: GameInfo, transition: usize, turn: usize, remaining: u8) -> BoardMoveState {
-        let duration;
-        {
+    pub fn new(info: GameInfo, transition: usize, turn: usize, remaining: u8) -> Self {
+        let duration = {
             let start_space = info.map.get_space(info.players[turn].space).unwrap();
             let end_space = info.map
                 .get_space(start_space.transitions[transition].to)
                 .unwrap();
-            duration = tputil::Point2D::dist(start_space.pos, end_space.pos) / 5.0;
+            tputil::Point2D::dist(start_space.pos, end_space.pos) / 5.0
         };
-        return BoardMoveState {
+        BoardMoveState {
             game: info,
             time: 0.0,
             transition: transition,
             duration: duration,
             turn: turn,
             remaining: remaining,
-        };
+        }
     }
 }
 
@@ -315,14 +314,14 @@ pub struct DieRollState {
 }
 
 impl DieRollState {
-    pub fn new(game: GameInfo, turn: usize) -> DieRollState {
-        return DieRollState {
+    pub fn new(game: GameInfo, turn: usize) -> Self {
+        DieRollState {
             game: game,
             turn: turn,
             number: 0,
             jump: false,
             time: 0.0,
-        };
+        }
     }
 }
 

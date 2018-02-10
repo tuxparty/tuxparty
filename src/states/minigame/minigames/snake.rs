@@ -39,7 +39,7 @@ impl MGSnake {
         let snakes: Vec<Snake> = (0..count)
             .map(|i| {
                 let head = (scale * (i * 2 + 1) as i8, MGSnake::GRID_SIZE / 2);
-                return Snake {
+                Snake {
                     tail: vec![
                         head,
                         (
@@ -56,14 +56,14 @@ impl MGSnake {
                     },
                     player: players[i],
                     turned: false,
-                };
+                }
             })
             .collect();
-        return Box::new(MGSnake {
+        Box::new(MGSnake {
             snakes: snakes.into_boxed_slice(),
             pellets: vec![],
             unhandled_time: 0.0,
-        });
+        })
     }
 }
 
@@ -76,13 +76,13 @@ impl states::minigame::Minigame for MGSnake {
             trans,
             gl,
         );
-        let scale = 2.0 / MGSnake::GRID_SIZE as f64;
+        let scale = 2.0 / f64::from(MGSnake::GRID_SIZE);
         let transform = trans.trans(-1.0, -1.0).scale(scale, scale);
-        for pellet in self.pellets.iter() {
+        for pellet in &self.pellets {
             const COLOR2: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
             graphics::rectangle(
                 COLOR2,
-                [pellet.0 as f64 + 0.1, pellet.1 as f64 + 0.1, 0.8, 0.8],
+                [f64::from(pellet.0) + 0.1, f64::from(pellet.1) + 0.1, 0.8, 0.8],
                 transform,
                 gl,
             );
@@ -179,12 +179,9 @@ impl states::minigame::Minigame for MGSnake {
                     continue;
                 }
                 let head = snake.tail[snake.tail.len() - 1];
-                let mut dies = false;
-                if head.0 < 0 || head.1 < 0 || head.0 >= MGSnake::GRID_SIZE
-                    || head.1 >= MGSnake::GRID_SIZE
-                {
-                    dies = true;
-                }
+                let mut dies = head.0 < 0 || head.1 < 0
+                    || head.0 >= MGSnake::GRID_SIZE
+                    || head.1 >= MGSnake::GRID_SIZE;
                 if !dies {
                     for (index2, snake2) in self.snakes.iter().enumerate() {
                         for (i, cube) in snake2.tail.iter().enumerate() {
@@ -221,6 +218,6 @@ impl states::minigame::Minigame for MGSnake {
             }
             return Some(MinigameResult::Winner(last_alive as usize));
         }
-        return None;
+        None
     }
 }

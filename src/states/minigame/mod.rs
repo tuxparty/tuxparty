@@ -115,11 +115,12 @@ impl MinigameState {
             Box::new(minigames::snake::MGSnake::init),
             Box::new(minigames::castleclimb::MGCastleClimb::init),
             Box::new(minigames::itemcatch::MGItemCatch::init),
+            Box::new(minigames::pong::MGPong::init),
         ]);
         return MinigameState {
             game: game,
-            minigame: games_list[rand::thread_rng().gen_range(0, games_list.len())](slice),
-            //minigame: games_list[4](slice),
+            //minigame: games_list[rand::thread_rng().gen_range(0, games_list.len())](slice),
+            minigame: games_list[5](slice),
         };
     }
 }

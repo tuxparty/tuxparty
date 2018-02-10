@@ -163,7 +163,7 @@ impl states::minigame::Minigame for MGPong {
     let mut survivor: Option<usize> = None;
     for i in 0..4 {
       let axis;
-      const SCALE: f64 = 0.02;
+      const SCALE: f64 = 0.01;
       let scale;
       if i == 0 || i == 1 {
         axis = tputil::Axis::LeftStickY;

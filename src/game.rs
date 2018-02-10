@@ -17,14 +17,14 @@ impl App {
         const BGCOLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
         let area = c.viewport.unwrap().draw_size;
-        let scale = std::cmp::min(area[0], area[1]) as f64 / 2.0;
+        let scale = f64::from(std::cmp::min(area[0], area[1])) / 2.0;
 
         graphics::clear(BGCOLOR, gl);
         let transform = c.transform
-            .trans(area[0] as f64 / 2.0, area[1] as f64 / 2.0)
+            .trans(f64::from(area[0]) / 2.0, f64::from(area[1]) / 2.0)
             .scale(scale, scale);
         let state = self.state.take().unwrap();
-        state.render(gl, transform, &self);
+        state.render(gl, transform, self);
         self.state = Some(state);
     }
 
@@ -89,11 +89,11 @@ impl NumberRenderer {
                 '-' => 10,
                 _ => c.to_digit(10).unwrap_or(0) as usize
             };
-            self.draw_digit(digit_index, size, tputil::Alignment::TOP_LEFT, transform.trans(100.0 * i as f64 * size / 140.0, 0.0), gl);
+            self.draw_digit(digit_index, size, &tputil::Alignment::TOP_LEFT, transform.trans(100.0 * i as f64 * size / 140.0, 0.0), gl);
         }
     }
 
-    pub fn draw_digit(&self, digit_index: usize, size: f64, alignment: tputil::Alignment, transform: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
+    pub fn draw_digit(&self, digit_index: usize, size: f64, alignment: &tputil::Alignment, transform: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
         let digit = &self.glyphs[digit_index];
         let scale = size / 140.0;
         graphics::image(digit, alignment.align(transform.scale(scale, scale), 5.0*140.0/7.0, 140.0), gl);

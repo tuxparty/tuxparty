@@ -32,9 +32,9 @@ const START_SPEED: f64 = 0.8;
 
 impl MGPong {
   pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
-    Box::new(MGPong::new(players))
+    Box::new(MGPong::new(&players))
   }
-  pub fn new(players: Box<[tputil::Player]>) -> Self {
+  pub fn new(players: &[tputil::Player]) -> Self {
     MGPong {
       players: players
         .iter()
@@ -55,7 +55,7 @@ impl MGPong {
     let angle = rand::thread_rng().gen_range(0.0, TAU);
     tputil::Point2D::new(angle.cos() * speed, angle.sin() * speed)
   }
-  fn get_player_mut(players: &mut Box<[PongPlayer]>, index: usize) -> Option<&mut PongPlayer> {
+  fn get_player_mut(players: &mut [PongPlayer], index: usize) -> Option<&mut PongPlayer> {
     players.get_mut(index).and_then(|p| {
         if p.out {
           None
@@ -64,7 +64,7 @@ impl MGPong {
         }
       })
   }
-  fn get_player(players: &Box<[PongPlayer]>, index: usize) -> Option<&PongPlayer> {
+  fn get_player(players: &[PongPlayer], index: usize) -> Option<&PongPlayer> {
     players.get(index).and_then(|p| {
         if p.out {
           None
@@ -183,7 +183,7 @@ impl states::minigame::Minigame for MGPong {
         }
         let last_pos = self.ball_pos;
         player.position = (player.position
-          + app.input.get_axis(&player.player.input, axis) as f64 * scale)
+          + f64::from(app.input.get_axis(&player.player.input, axis)) * scale)
           .max(-1.0 + PADDLE_WIDTH / 2.0)
           .min(1.0 - PADDLE_WIDTH / 2.0);
         if i == 0 {

@@ -92,7 +92,7 @@ impl states::minigame::Minigame for MGSnake {
                 let color = tputil::COLORS[snake.player.color];
                 graphics::rectangle(
                     color,
-                    [cube.0 as f64, cube.1 as f64, 1.0, 1.0],
+                    [cube.0.into(), cube.1.into(), 1.0, 1.0],
                     transform,
                     gl,
                 );

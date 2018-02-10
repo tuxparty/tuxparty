@@ -37,13 +37,12 @@ fn main() {
             gl.draw(r.viewport(), |c, glo| app.render(c, glo));
         }
         if let Some(u) = e.update_args() {
-            let multiplier;
-            if app.input.is_key_pressed(&piston::input::keyboard::Key::F4) {
-                multiplier = 3.0;
+            let multiplier = if app.input.is_key_pressed(&piston::input::keyboard::Key::F4) {
+                3.0
             }
             else {
-                multiplier = 1.0;
-            }
+                1.0
+            };
             app.update(u.dt * multiplier);
         }
         if let Some(piston::input::Button::Keyboard(key)) = e.press_args() {

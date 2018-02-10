@@ -23,7 +23,7 @@ impl game::State for MenuState {
     }
     fn update(&mut self, app: &mut game::App, _time: f64) {
         let pressed = app.input.get_pressed_any(tputil::Button::South);
-        if pressed.len() > 0 {
+        if !pressed.is_empty() {
             app.goto_state(JoinState::new());
         }
     }
@@ -121,7 +121,7 @@ impl game::State for JoinState {
         }
         for player in &mut self.players {
             let movement = app.input.get_axis(&player.player.input, tputil::Axis::LeftStickX);
-            player.rotation += movement as f64 * time * 3.0;
+            player.rotation += f64::from(movement) * time * 3.0;
         }
 
         self.players.retain(|p| {
@@ -129,10 +129,10 @@ impl game::State for JoinState {
                 || app.input.is_pressed(&p.player.input, tputil::Button::South)
         });
 
-        if app.input.get_pressed_any(tputil::Button::Start).len() > 0 {
+        if !app.input.get_pressed_any(tputil::Button::Start).is_empty() {
             let players: Vec<states::ingame::PlayerInfo> = self.players
                 .iter()
-                .map(|player| states::ingame::PlayerInfo::from((*player).clone()))
+                .map(|player| states::ingame::PlayerInfo::from(*player))
                 .collect();
             let board = board::Board::get_default_board();
             let game = states::ingame::GameInfo::new(players, board);

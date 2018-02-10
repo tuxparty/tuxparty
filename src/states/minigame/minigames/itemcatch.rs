@@ -45,9 +45,9 @@ pub struct MGItemCatch {
 
 impl MGItemCatch {
     pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
-        return Box::new(MGItemCatch::new(players));
+        return Box::new(MGItemCatch::new(&players));
     }
-    fn new(players: Box<[tputil::Player]>) -> Self {
+    fn new(players: &[tputil::Player]) -> Self {
         MGItemCatch {
             players: players
                 .iter()
@@ -119,16 +119,17 @@ impl states::minigame::Minigame for MGItemCatch {
             return Some(MinigameResult::Ratios(
                 self.players
                     .iter()
-                    .map(|x| x.points as f64)
+                    .map(|x| f64::from(x.points))
                     .collect::<std::vec::Vec<f64>>()
                     .into_boxed_slice(),
             ));
         }
         for player in self.players.iter_mut() {
-            player.velocity.x = app.input
-                .get_axis(&player.player.input, tputil::Axis::LeftStickX)
-                as f64;
-            player.position = player.position + player.velocity.multiply_scalar(time);
+            player.velocity.x = f64::from(
+                app.input.get_axis(
+                    &player.player.input,
+                    tputil::Axis::LeftStickX));
+            player.position += player.velocity.multiply_scalar(time);
             player.velocity.y += MGItemCatch::GRAVITY * time;
             if player.position.y >= 0.5 {
                 player.position.y = 0.5;
@@ -168,13 +169,13 @@ impl states::minigame::Minigame for MGItemCatch {
         }
         let chance = 1.0 * time;
         if rand::thread_rng().next_f64() < chance {
-            let side = if rand::thread_rng().gen() { 1 } else { -1 };
+            let side = if rand::thread_rng().gen() { 1.0 } else { -1.0 };
             let start_vel = tputil::Point2D::new(
-                rand::thread_rng().next_f64().sqrt() * 2.0 * -side as f64,
+                rand::thread_rng().next_f64().sqrt() * 2.0 * -side,
                 -rand::thread_rng().next_f64().sqrt(),
             );
             let start_pos = tputil::Point2D::new(
-                1.25 * side as f64,
+                1.25 * side,
                 rand::thread_rng().next_f64() * 1.5 - 1.5,
             );
             let value = if rand::thread_rng().gen() { 1 } else { -1 };

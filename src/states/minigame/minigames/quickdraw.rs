@@ -61,16 +61,14 @@ impl states::minigame::Minigame for MGQuickdraw {
             let mut x = i as f64;
             x -= count as f64 / 2.0;
             let size = (x as f64 * scale * std::f64::consts::PI / 2.0).cos();
-            let rotation;
-            if self.player_buzzes[i] < 0.0 {
+            let rotation = if self.player_buzzes[i] < 0.0 {
                 // no buzz yet, so not dead
-                rotation = 0.0;
+                0.0
             } else {
-                rotation =
-                    (-std::f64::consts::FRAC_PI_2).max((self.player_buzzes[i] - self.time) * 2.0);
-            }
+                (-std::f64::consts::FRAC_PI_2).max((self.player_buzzes[i] - self.time) * 2.0)
+            };
             let transform = trans
-                .trans(x as f64 * scale, size)
+                .trans(x * scale, size)
                 .scale(size, size)
                 .rot_rad(rotation);
             graphics::rectangle(

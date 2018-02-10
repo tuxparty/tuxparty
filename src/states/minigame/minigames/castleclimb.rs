@@ -63,7 +63,7 @@ impl states::minigame::Minigame for MGCastleClimb {
         for (index, player) in self.players.iter_mut().enumerate() {
             player.velocity.x = app.input
                 .get_axis(&player.player.input, tputil::Axis::LeftStickX)
-                as f64;
+                .into();
             player.position = player.position + diff + player.velocity.multiply_scalar(time);
             player.velocity.y += MGCastleClimb::GRAVITY * time;
             for block in &self.blocks {
@@ -112,7 +112,7 @@ impl states::minigame::Minigame for MGCastleClimb {
             if x + last.x > 1.0 || (last.x - x > -1.0 && rand::thread_rng().gen_weighted_bool(2)) {
                 x = -x;
             }
-            last = last + tputil::Point2D::new(x, y);
+            last += tputil::Point2D::new(x, y);
             self.blocks.push(last);
         }
         return None;

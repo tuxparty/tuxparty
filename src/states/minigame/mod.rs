@@ -51,7 +51,7 @@ impl MinigameState {
             MinigameResult::Nothing => self.game
                 .players
                 .iter()
-                .map(|x| 0)
+                .map(|_| 0)
                 .collect::<std::vec::Vec<i16>>()
                 .into_boxed_slice(),
             MinigameResult::Winner(index) => self.game
@@ -87,13 +87,13 @@ impl MinigameState {
                 let scale = if total == 0.0 {
                     1.0
                 } else {
-                    MinigameState::MINIGAME_COINS as f64 / total
+                    f64::from(MinigameState::MINIGAME_COINS) / total
                 };
                 println!("{} {}", total, scale);
                 ratios
                     .iter()
                     .enumerate()
-                    .map(|(i, x)| (x * scale).max(-(self.game.players[i].coins as f64)).trunc() as i16)
+                    .map(|(i, x)| (x * scale).max(-f64::from(self.game.players[i].coins)).trunc() as i16)
                     .collect::<std::vec::Vec<i16>>()
                     .into_boxed_slice()
             }
@@ -117,11 +117,11 @@ impl MinigameState {
             Box::new(minigames::itemcatch::MGItemCatch::init),
             Box::new(minigames::pong::MGPong::init),
         ]);
-        return MinigameState {
+        MinigameState {
             game: game,
             minigame: games_list[rand::thread_rng().gen_range(0, games_list.len())](slice),
             //minigame: games_list[5](slice),
-        };
+        }
     }
 }
 
@@ -133,11 +133,11 @@ struct MinigameResultState {
 
 impl MinigameResultState {
     pub fn new(game: states::ingame::GameInfo, result: Box<[i16]>) -> MinigameResultState {
-        return MinigameResultState {
+        MinigameResultState {
             game,
             result,
             time: 0.0,
-        };
+        }
     }
 }
 

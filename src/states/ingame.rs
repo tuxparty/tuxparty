@@ -62,7 +62,7 @@ impl GameInfo {
 
         let transform = (-center).translate(trans).scale(scale, scale);
         for start in &self.map.spaces {
-            for transition in start.transitions.into_iter() {
+            for transition in start.transitions.iter() {
                 let end = self.map.get_space(transition.to).unwrap();
                 graphics::line(COLOR4, 0.2, [start.pos.x, start.pos.y, end.pos.x, end.pos.y], transform, gl);
             }
@@ -88,7 +88,7 @@ impl GameInfo {
                     graphics::rectangle(
                         color,
                         [
-                            space.pos.x - 1.0 + so_far as f64 * 2.0 / 3.0,
+                            space.pos.x - 1.0 + f64::from(so_far) * 2.0 / 3.0,
                             space.pos.y + 1.0,
                             0.5,
                             0.5,
@@ -200,7 +200,7 @@ impl game::State for BoardMoveState {
         app.number_renderer.draw_digit(
             self.remaining as usize,
             1.0,
-            tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
+            &tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
             transform.trans(pos.x, pos.y - 1.0),
             gl,
         );
@@ -242,9 +242,8 @@ impl game::State for BoardMoveState {
                     ));
                 }
             } else {
-                new_game_state.players[self.turn].coins = (new_game_state.players[self.turn].coins
-                    as i64
-                    + match self.game
+                new_game_state.players[self.turn].coins = (i32::from(new_game_state.players[self.turn].coins)
+                    + i32::from(match self.game
                         .map
                         .get_space(new_game_state.players[self.turn].space)
                         .unwrap()
@@ -252,7 +251,7 @@ impl game::State for BoardMoveState {
                     {
                         board::SpaceType::Positive => 3,
                         board::SpaceType::Negative => -(3 as i8),
-                    } as i64)
+                    }))
                     .max(0) as u16;
                 app.goto_state(SpaceResultState {
                     game: new_game_state,
@@ -381,12 +380,11 @@ impl game::State for DieRollState {
         let player = self.game.players[self.turn];
         let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();
-        let y;
-        if self.jump {
-            y = -(self.time - 1.0).powf(2.0) + 1.0;
+        let y = if self.jump {
+            -(self.time - 1.0).powf(2.0) + 1.0
         } else {
-            y = 0.0;
-        }
+            0.0
+        };
         graphics::rectangle(
             color,
             graphics::rectangle::centered_square(space.pos.x, space.pos.y - y, 0.7),
@@ -401,7 +399,7 @@ impl game::State for DieRollState {
         app.number_renderer.draw_digit(
             self.number as usize,
             1.0,
-            tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
+            &tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
             transform.trans(space.pos.x, space.pos.y - off),
             gl,
         );
@@ -452,7 +450,7 @@ impl game::State for TransitionChoiceState {
                 tputil::Axis::LeftStickY,
             );
             if input_x.abs() > 0.5 || input_y.abs() > 0.5 {
-                let user_angle = input_y.atan2(input_x) as f64;
+                let user_angle = f64::from(input_y.atan2(input_x));
                 println!("user_angle {}", user_angle);
                 let space = self.game
                     .map
@@ -524,7 +522,7 @@ impl game::State for TransitionChoiceState {
         app.number_renderer.draw_digit(
             self.remaining as usize,
             1.0,
-            tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
+            &tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
             transform.trans(space.pos.x, space.pos.y - 1.0),
             gl,
         );

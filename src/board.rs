@@ -28,7 +28,7 @@ pub struct Board {
 
 impl Board {
     pub fn get_default_board() -> Board {
-        return Board {
+        Board {
             spaces: vec![
                 Space {
                     id: 0,
@@ -211,7 +211,7 @@ impl Board {
                     transitions: Box::new([SpaceTransition { to: 0 }])
                 },
             ]
-        };
+        }
     }
 
     pub fn get_space(&self, id: SpaceID) -> Option<&Space> {
@@ -220,6 +220,6 @@ impl Board {
                 return Some(space);
             }
         }
-        return None;
+        None
     }
 }

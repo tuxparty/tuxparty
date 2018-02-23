@@ -2,6 +2,7 @@ use std;
 use graphics;
 use opengl_graphics;
 use rand;
+use ears;
 
 use tputil;
 use states;
@@ -10,6 +11,7 @@ use game;
 use rand::Rng;
 use graphics::Transformed;
 use states::minigame::MinigameResult;
+use ears::AudioController;
 
 struct ICPlayer {
     player: tputil::Player,
@@ -41,6 +43,7 @@ pub struct MGItemCatch {
     players: Box<[ICPlayer]>,
     time: f64,
     items: std::vec::Vec<ICItem>,
+    music: Option<ears::Music>
 }
 
 impl MGItemCatch {
@@ -48,6 +51,10 @@ impl MGItemCatch {
         Box::new(MGItemCatch::new(&players))
     }
     fn new(players: &[tputil::Player]) -> Self {
+        let mut music = tputil::ASSETS_PATH.join("music/thatsong.ogg").to_str().and_then(|p|ears::Music::new(p));
+        if let Some(ref mut music) = music {
+            music.play();
+        }
         MGItemCatch {
             players: players
                 .iter()
@@ -63,6 +70,7 @@ impl MGItemCatch {
                 .into_boxed_slice(),
             time: 0.0,
             items: std::vec::Vec::new(),
+            music
         }
     }
     const PLAYER_RADIUS: f64 = 0.06;
@@ -108,7 +116,7 @@ impl states::minigame::Minigame for MGItemCatch {
                 gl,
             );
         }
-        let time_left = (MGItemCatch::TIME_LIMIT - self.time).ceil() as i8;
+        let time_left = ((MGItemCatch::TIME_LIMIT - self.time).ceil() as i8).max(0);
         let time_str = format!("{:02}", time_left);
         app.number_renderer
             .draw_str(&time_str, 0.3, trans.trans(-(0.3 * 5.0 / 7.0), -1.0), gl);
@@ -116,6 +124,11 @@ impl states::minigame::Minigame for MGItemCatch {
     fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
         self.time += time;
         if self.time > MGItemCatch::TIME_LIMIT {
+            if let Some(ref mut music) = self.music {
+                if music.is_playing() {
+                    return None; // wait until music stops
+                }
+            }
             return Some(MinigameResult::Ratios(
                 self.players
                     .iter()

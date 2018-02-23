@@ -2,10 +2,17 @@ use std;
 use gilrs;
 use piston;
 use graphics;
+use find_folder;
 pub use gilrs::Axis;
 pub use gilrs::Button;
 
 use graphics::Transformed;
+
+lazy_static! {
+    pub static ref ASSETS_PATH: std::path::PathBuf = {
+        find_folder::Search::Parents(3).for_folder("assets").expect("Couldn't find assets folder")
+    };
+}
 
 pub const COLORS: [[f32; 4]; 5] = [
     [0.0, 1.0, 0.0, 1.0],

@@ -8,6 +8,9 @@ extern crate opengl_graphics;
 extern crate piston;
 extern crate rand;
 extern crate sdl2_window;
+extern crate ears;
+extern crate find_folder;
+#[macro_use] extern crate lazy_static;
 
 use sdl2_window::Sdl2Window as Window;
 use piston::input::{RenderEvent, UpdateEvent, PressEvent, ReleaseEvent};

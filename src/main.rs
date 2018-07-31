@@ -25,7 +25,7 @@ fn main() {
     let mut gl = opengl_graphics::GlGraphics::new(gl_version);
 
     let mut app = game::App {
-        input: tputil::InputState::new(),
+        input: tputil::InputState::new().unwrap(),
         state: Some(Box::new(states::setup::MenuState {})),
         number_renderer: game::NumberRenderer::new()
     };

@@ -4,7 +4,7 @@ name = "tuxparty"
 version = "0.1.0"
 
 [dependencies]
-gilrs = "0.5.1"
+gilrs = "0.6.1"
 image = "0.17.0"
 piston = "0.35.0"
 piston2d-graphics = "0.23.0"

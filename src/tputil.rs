@@ -155,11 +155,11 @@ pub struct InputState {
 }
 
 impl InputState {
-    pub fn new() -> Self {
-        InputState {
-            backend: gilrs::Gilrs::new(),
+    pub fn new() -> Result<Self, gilrs::Error> {
+        Ok(InputState {
+            backend: gilrs::Gilrs::new()?,
             keyboard_state: std::collections::HashMap::new(),
-        }
+        })
     }
 
     pub fn get_axis(&self, ctl: &InputMethod, axis: Axis) -> f32 {
@@ -169,7 +169,8 @@ impl InputState {
                     0.0
                 }
                 else {
-                    self.backend[ctl.id].value(axis)
+                    let value = self.backend[ctl.id].value(axis);
+                    value
                 }
             }
             InputType::Keyboard => match axis {

@@ -37,7 +37,7 @@ fn main() {
             gl.draw(r.viewport(), |c, glo| app.render(c, glo));
         }
         if let Some(u) = e.update_args() {
-            let multiplier = if app.input.is_key_pressed(&piston::input::keyboard::Key::F4) {
+            let multiplier = if app.input.is_key_pressed(piston::input::keyboard::Key::F4) {
                 3.0
             } else {
                 1.0

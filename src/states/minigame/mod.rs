@@ -129,7 +129,7 @@ impl MinigameState {
             Box::new(minigames::pong::MGPong::init),
         ]);
         MinigameState {
-            game: game,
+            game,
             minigame: games_list[rand::thread_rng().gen_range(0, games_list.len())](players),
             //minigame: games_list[5](slice),
         }

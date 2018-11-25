@@ -26,7 +26,7 @@ impl MGHotRope {
     pub fn new(players: Vec<tputil::Player>) -> Self {
         let count = players.len();
         MGHotRope {
-            players: players,
+            players,
             time: 0.0,
             rope_time: 10.0,
             swept_at: std::iter::repeat(-1.0)

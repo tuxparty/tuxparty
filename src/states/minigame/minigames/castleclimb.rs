@@ -28,7 +28,7 @@ impl MGCastleClimb {
             players: players
                 .into_iter()
                 .map(|player| CCPlayer {
-                    player: player,
+                    player,
                     position: tputil::Point2D::new(0.0, -0.2),
                     velocity: tputil::Point2D::ZERO,
                 })

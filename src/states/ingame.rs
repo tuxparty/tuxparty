@@ -48,8 +48,8 @@ impl GameInfo {
         let star_space = GameInfo::choose_star_space(&map);
         GameInfo {
             players: players.into_iter().collect(),
-            map: map,
-            star_space: star_space,
+            map,
+            star_space,
         }
     }
 
@@ -186,10 +186,10 @@ impl BoardMoveState {
         BoardMoveState {
             game: info,
             time: 0.0,
-            transition: transition,
-            duration: duration,
-            turn: turn,
-            remaining: remaining,
+            transition,
+            duration,
+            turn,
+            remaining,
         }
     }
 }
@@ -359,8 +359,8 @@ pub struct DieRollState {
 impl DieRollState {
     pub fn new(game: GameInfo, turn: usize) -> Self {
         DieRollState {
-            game: game,
-            turn: turn,
+            game,
+            turn,
             number: 0,
             jump: false,
             time: 0.0,
@@ -502,7 +502,7 @@ impl game::State for TransitionChoiceState {
                     .unwrap();
                 let closest = space
                     .transitions
-                    .into_iter()
+                    .iter()
                     .enumerate()
                     .map(|(idx, transition)| {
                         let pos = self.game.map.get_space(transition.to).unwrap().pos;
@@ -549,7 +549,7 @@ impl game::State for TransitionChoiceState {
             transform,
             gl,
         );
-        for (index, transition) in space.transitions.into_iter().enumerate() {
+        for (index, transition) in space.transitions.iter().enumerate() {
             let dest_space = self.game.map.get_space(transition.to).unwrap();
             let displacement = dest_space.pos - space.pos;
             let p1 = space.pos + displacement.multiply_scalar(0.2);

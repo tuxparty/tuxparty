@@ -6,6 +6,7 @@ use std;
 
 use graphics::Transformed;
 
+#[derive(Copy, Clone)]
 pub enum Axis {
     X,
     Y,
@@ -232,8 +233,8 @@ impl InputState {
         }
     }
 
-    pub fn is_key_pressed(&self, key: &piston::input::keyboard::Key) -> bool {
-        self.keyboard_state.contains_key(key)
+    pub fn is_key_pressed(&self, key: piston::input::keyboard::Key) -> bool {
+        self.keyboard_state.contains_key(&key)
     }
 
     pub fn get_pressed_any(&self, button: Button) -> Vec<InputMethod> {

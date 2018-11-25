@@ -151,7 +151,7 @@ impl states::minigame::Minigame for MGSnake {
 
             // extend head
             for snake in self.snakes.iter_mut() {
-                if snake.tail.len() < 1 {
+                if snake.tail.is_empty() {
                     continue;
                 }
                 let old_head = snake.tail[snake.tail.len() - 1];
@@ -164,7 +164,7 @@ impl states::minigame::Minigame for MGSnake {
             }
             // eat / retract / reset turned
             for snake in self.snakes.iter_mut() {
-                if snake.tail.len() < 1 {
+                if snake.tail.is_empty() {
                     continue;
                 }
                 snake.turned = false;
@@ -186,7 +186,7 @@ impl states::minigame::Minigame for MGSnake {
             let mut last_alive: i8 = -1;
             let mut multiple_alive = false;
             for (index, snake) in self.snakes.iter().enumerate() {
-                if snake.tail.len() < 1 {
+                if snake.tail.is_empty() {
                     continue;
                 }
                 let head = snake.tail[snake.tail.len() - 1];

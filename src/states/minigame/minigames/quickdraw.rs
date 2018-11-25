@@ -25,7 +25,7 @@ impl MGQuickdraw {
     fn new(players: Vec<tputil::Player>) -> MGQuickdraw {
         let count = players.len();
         MGQuickdraw {
-            players: players,
+            players,
             player_buzzes: std::iter::repeat(-1.0)
                 .take(count)
                 .collect::<Vec<_>>()

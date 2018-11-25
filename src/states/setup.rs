@@ -137,7 +137,7 @@ impl game::State for JoinState {
         for player in &mut self.players {
             let movement = props
                 .input
-                .get_axis(&player.player.input, tputil::Axis::LeftStickX);
+                .get_axis(&player.player.input, tputil::Axis::X);
             player.rotation += f64::from(movement) * props.time * 3.0;
         }
 

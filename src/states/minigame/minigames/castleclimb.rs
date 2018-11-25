@@ -63,7 +63,7 @@ impl states::minigame::Minigame for MGCastleClimb {
         for (index, player) in self.players.iter_mut().enumerate() {
             player.velocity.x = props
                 .input
-                .get_axis(&player.player.input, tputil::Axis::LeftStickX)
+                .get_axis(&player.player.input, tputil::Axis::X)
                 .into();
             player.position = player.position + diff + player.velocity.multiply_scalar(props.time);
             player.velocity.y += MGCastleClimb::GRAVITY * props.time;

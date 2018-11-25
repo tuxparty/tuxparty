@@ -125,7 +125,7 @@ impl states::minigame::Minigame for MGItemCatch {
             player.velocity.x = f64::from(
                 props
                     .input
-                    .get_axis(&player.player.input, tputil::Axis::LeftStickX),
+                    .get_axis(&player.player.input, tputil::Axis::X),
             );
             player.position += player.velocity.multiply_scalar(props.time);
             player.velocity.y += MGItemCatch::GRAVITY * props.time;

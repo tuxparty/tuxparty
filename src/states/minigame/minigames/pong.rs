@@ -158,10 +158,10 @@ impl states::minigame::Minigame for MGPong {
             const SCALE: f64 = 0.01;
             let scale;
             if i == 0 || i == 1 {
-                axis = tputil::Axis::LeftStickY;
+                axis = tputil::Axis::Y;
                 scale = -SCALE;
             } else {
-                axis = tputil::Axis::LeftStickX;
+                axis = tputil::Axis::X;
                 scale = SCALE;
             }
             const WALL_DIST: f64 = 1.0 - WALL_OFFSET - PADDLE_HEIGHT - BALL_RADIUS;

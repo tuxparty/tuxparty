@@ -1,11 +1,15 @@
 use gilrs;
-pub use gilrs::Axis;
 pub use gilrs::Button;
 use graphics;
 use piston;
 use std;
 
 use graphics::Transformed;
+
+pub enum Axis {
+    X,
+    Y,
+}
 
 pub const COLORS: [[f32; 4]; 5] = [
     [0.0, 1.0, 0.0, 1.0],
@@ -175,12 +179,15 @@ impl InputState {
                 if self.backend[ctl.id].status() == gilrs::Status::Disconnected {
                     0.0
                 } else {
-                    let value = self.backend[ctl.id].value(axis);
-                    value
+                    let raw = &self.backend[ctl.id];
+                    match axis {
+                        Axis::X => raw.value(gilrs::Axis::LeftStickX) + raw.value(gilrs::Axis::DPadX),
+                        Axis::Y => raw.value(gilrs::Axis::LeftStickY) + raw.value(gilrs::Axis::DPadY),
+                    }.max(-1.0).min(1.0)
                 }
             }
             InputType::Keyboard => match axis {
-                Axis::LeftStickX => {
+                Axis::X => {
                     (match self.keyboard_state.get(&piston::input::Key::Left) {
                         Some(_) => -1.0,
                         _ => 0.0,
@@ -189,7 +196,7 @@ impl InputState {
                         _ => 0.0,
                     })
                 }
-                Axis::LeftStickY => {
+                Axis::Y => {
                     (match self.keyboard_state.get(&piston::input::Key::Up) {
                         Some(_) => 1.0,
                         _ => 0.0,
@@ -198,7 +205,6 @@ impl InputState {
                         _ => 0.0,
                     })
                 }
-                _ => 0.0,
             },
         }
     }

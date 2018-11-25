@@ -36,7 +36,7 @@ impl game::State for MenuState {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 struct JoinStatePlayer {
     player: tputil::Player,
     rotation: f64,
@@ -50,17 +50,6 @@ impl JoinStatePlayer {
                 input: player,
                 color: color,
             },
-        }
-    }
-}
-
-impl From<JoinStatePlayer> for states::ingame::PlayerInfo {
-    fn from(player: JoinStatePlayer) -> Self {
-        states::ingame::PlayerInfo {
-            player: player.player,
-            space: 0,
-            coins: 0,
-            stars: 0,
         }
     }
 }
@@ -158,7 +147,7 @@ impl game::State for JoinState {
             let players: Vec<states::ingame::PlayerInfo> = self
                 .players
                 .iter()
-                .map(|player| states::ingame::PlayerInfo::from(*player))
+                .map(|player| states::ingame::PlayerInfo::from(player.player.clone()))
                 .collect();
             let board = board::Board::get_default_board();
             let game = states::ingame::GameInfo::new(players, board);

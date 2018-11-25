@@ -110,7 +110,7 @@ const KEYBOARD: InputMethod = InputMethod {
     id: 0,
 };
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Player {
     pub input: InputMethod,
     pub color: usize,

@@ -31,15 +31,15 @@ const MAX_BOUNCE_ANGLE: f64 = PI / 3.0;
 const START_SPEED: f64 = 0.8;
 
 impl MGPong {
-    pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
-        Box::new(MGPong::new(&players))
+    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
+        Box::new(MGPong::new(players))
     }
-    pub fn new(players: &[tputil::Player]) -> Self {
+    pub fn new(players: Vec<tputil::Player>) -> Self {
         MGPong {
             players: players
-                .iter()
+                .into_iter()
                 .map(|player| PongPlayer {
-                    player: *player,
+                    player,
                     position: 0.0,
                     out: false,
                 })

@@ -11,7 +11,7 @@ use rand::Rng;
 use states::minigame::MinigameResult;
 
 pub struct MGHotRope {
-    players: Box<[tputil::Player]>,
+    players: Vec<tputil::Player>,
     time: f64,
     rope_time: f64,
     swept_at: Box<[f64]>,
@@ -20,10 +20,10 @@ pub struct MGHotRope {
 }
 
 impl MGHotRope {
-    pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
+    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
         Box::new(MGHotRope::new(players))
     }
-    pub fn new(players: Box<[tputil::Player]>) -> Self {
+    pub fn new(players: Vec<tputil::Player>) -> Self {
         let count = players.len();
         MGHotRope {
             players: players,

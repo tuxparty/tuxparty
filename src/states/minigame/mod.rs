@@ -114,17 +114,13 @@ impl MinigameState {
         }
     }
     pub fn new(game: states::ingame::GameInfo) -> MinigameState {
-        let slice;
-        {
-            slice = game
-                .players
-                .clone()
-                .into_iter()
-                .map(|player| player.player)
-                .collect::<Vec<tputil::Player>>()
-                .into_boxed_slice();
-        }
-        let games_list: Box<[Box<Fn(Box<[tputil::Player]>) -> Box<Minigame>>]> = Box::new([
+        let players = game
+            .players
+            .iter()
+            .cloned()
+            .map(|player| player.player)
+            .collect::<Vec<tputil::Player>>();
+        let games_list: Box<[Box<Fn(Vec<tputil::Player>) -> Box<Minigame>>]> = Box::new([
             Box::new(minigames::quickdraw::MGQuickdraw::init),
             Box::new(minigames::hotrope::MGHotRope::init),
             Box::new(minigames::snake::MGSnake::init),
@@ -134,7 +130,7 @@ impl MinigameState {
         ]);
         MinigameState {
             game: game,
-            minigame: games_list[rand::thread_rng().gen_range(0, games_list.len())](slice),
+            minigame: games_list[rand::thread_rng().gen_range(0, games_list.len())](players),
             //minigame: games_list[5](slice),
         }
     }

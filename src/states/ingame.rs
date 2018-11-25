@@ -12,12 +12,23 @@ use graphics::Transformed;
 use rand::Rng;
 use std::f64::consts::PI;
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct PlayerInfo {
     pub player: tputil::Player,
     pub space: board::SpaceID,
     pub coins: u16,
     pub stars: u8,
+}
+
+impl From<tputil::Player> for PlayerInfo {
+    fn from(player: tputil::Player) -> Self {
+        PlayerInfo {
+            player,
+            space: 0,
+            coins: 0,
+            stars: 0,
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -308,7 +319,7 @@ impl game::State for SpaceResultState {
             &number_renderer,
             &[self.turn],
         );
-        let player = self.game.players[self.turn];
+        let player = &self.game.players[self.turn];
         let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();
         graphics::rectangle(
@@ -411,7 +422,7 @@ impl game::State for DieRollState {
             &number_renderer,
             &[self.turn],
         );
-        let player = self.game.players[self.turn];
+        let player = &self.game.players[self.turn];
         let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();
         let y = if self.jump {
@@ -531,7 +542,7 @@ impl game::State for TransitionChoiceState {
             &number_renderer,
             &[self.turn],
         );
-        let player = self.game.players[self.turn];
+        let player = &self.game.players[self.turn];
         let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();
         graphics::rectangle(

@@ -22,13 +22,13 @@ pub struct MGCastleClimb {
 }
 
 impl MGCastleClimb {
-    pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
+    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
         Box::new(MGCastleClimb {
             blocks: vec![tputil::Point2D::ZERO],
             players: players
-                .iter()
+                .into_iter()
                 .map(|player| CCPlayer {
-                    player: *player,
+                    player: player,
                     position: tputil::Point2D::new(0.0, -0.2),
                     velocity: tputil::Point2D::ZERO,
                 })

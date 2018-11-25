@@ -44,15 +44,15 @@ pub struct MGItemCatch {
 }
 
 impl MGItemCatch {
-    pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
-        Box::new(MGItemCatch::new(&players))
+    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
+        Box::new(MGItemCatch::new(players))
     }
-    fn new(players: &[tputil::Player]) -> Self {
+    fn new(players: Vec<tputil::Player>) -> Self {
         MGItemCatch {
             players: players
-                .iter()
+                .into_iter()
                 .map(|player| ICPlayer {
-                    player: *player,
+                    player,
                     position: tputil::Point2D::ZERO,
                     velocity: tputil::Point2D::ZERO,
                     points: 0,

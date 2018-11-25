@@ -12,17 +12,17 @@ use rand::Rng;
 use states::minigame::MinigameResult;
 
 pub struct MGQuickdraw {
-    players: Box<[tputil::Player]>,
+    players: Vec<tputil::Player>,
     buzz_time: f64,
     time: f64,
     player_buzzes: Box<[f64]>,
 }
 
 impl MGQuickdraw {
-    pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
+    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
         Box::new(MGQuickdraw::new(players))
     }
-    fn new(players: Box<[tputil::Player]>) -> MGQuickdraw {
+    fn new(players: Vec<tputil::Player>) -> MGQuickdraw {
         let count = players.len();
         MGQuickdraw {
             players: players,

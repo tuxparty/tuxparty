@@ -33,11 +33,13 @@ pub struct MGSnake {
 
 impl MGSnake {
     const GRID_SIZE: i8 = 32;
-    pub fn init(players: Box<[tputil::Player]>) -> Box<states::minigame::Minigame> {
+    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
         let count = players.len();
         let scale = MGSnake::GRID_SIZE / count as i8 / 2;
-        let snakes: Vec<Snake> = (0..count)
-            .map(|i| {
+        let snakes: Vec<Snake> = players
+            .into_iter()
+            .enumerate()
+            .map(|(i, player)| {
                 let head = (scale * (i * 2 + 1) as i8, MGSnake::GRID_SIZE / 2);
                 Snake {
                     tail: vec![
@@ -55,7 +57,7 @@ impl MGSnake {
                         0 => Direction::North,
                         _ => Direction::South,
                     },
-                    player: players[i],
+                    player,
                     turned: false,
                 }
             })

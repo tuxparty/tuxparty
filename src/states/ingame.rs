@@ -486,14 +486,12 @@ impl game::State for TransitionChoiceState {
                 self.remaining,
             )))
         } else {
-            let input_x = props.input.get_axis(
-                &self.game.players[self.turn].player.input,
-                tputil::Axis::X,
-            );
-            let input_y = -props.input.get_axis(
-                &self.game.players[self.turn].player.input,
-                tputil::Axis::Y,
-            );
+            let input_x = props
+                .input
+                .get_axis(&self.game.players[self.turn].player.input, tputil::Axis::X);
+            let input_y = -props
+                .input
+                .get_axis(&self.game.players[self.turn].player.input, tputil::Axis::Y);
             if input_x.abs() > 0.5 || input_y.abs() > 0.5 {
                 let user_angle = f64::from(input_y.atan2(input_x));
                 println!("user_angle {}", user_angle);

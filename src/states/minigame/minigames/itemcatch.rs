@@ -122,11 +122,8 @@ impl states::minigame::Minigame for MGItemCatch {
             ));
         }
         for player in self.players.iter_mut() {
-            player.velocity.x = f64::from(
-                props
-                    .input
-                    .get_axis(&player.player.input, tputil::Axis::X),
-            );
+            player.velocity.x =
+                f64::from(props.input.get_axis(&player.player.input, tputil::Axis::X));
             player.position += player.velocity.multiply_scalar(props.time);
             player.velocity.y += MGItemCatch::GRAVITY * props.time;
             if player.position.y >= 0.5 {

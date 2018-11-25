@@ -181,9 +181,15 @@ impl InputState {
                 } else {
                     let raw = &self.backend[ctl.id];
                     match axis {
-                        Axis::X => raw.value(gilrs::Axis::LeftStickX) + raw.value(gilrs::Axis::DPadX),
-                        Axis::Y => raw.value(gilrs::Axis::LeftStickY) + raw.value(gilrs::Axis::DPadY),
-                    }.max(-1.0).min(1.0)
+                        Axis::X => {
+                            raw.value(gilrs::Axis::LeftStickX) + raw.value(gilrs::Axis::DPadX)
+                        }
+                        Axis::Y => {
+                            raw.value(gilrs::Axis::LeftStickY) + raw.value(gilrs::Axis::DPadY)
+                        }
+                    }
+                    .max(-1.0)
+                    .min(1.0)
                 }
             }
             InputType::Keyboard => match axis {

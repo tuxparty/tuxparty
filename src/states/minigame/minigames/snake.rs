@@ -118,9 +118,7 @@ impl states::minigame::Minigame for MGSnake {
         for snake in self.snakes.iter_mut() {
             if !snake.turned {
                 if snake.direction == Direction::North || snake.direction == Direction::South {
-                    let axis = props
-                        .input
-                        .get_axis(&snake.player.input, tputil::Axis::X);
+                    let axis = props.input.get_axis(&snake.player.input, tputil::Axis::X);
                     if axis < -0.4 {
                         snake.direction = Direction::West;
                         snake.turned = true;
@@ -129,9 +127,7 @@ impl states::minigame::Minigame for MGSnake {
                         snake.turned = true;
                     }
                 } else if snake.direction == Direction::West || snake.direction == Direction::East {
-                    let axis = props
-                        .input
-                        .get_axis(&snake.player.input, tputil::Axis::Y);
+                    let axis = props.input.get_axis(&snake.player.input, tputil::Axis::Y);
                     if axis < -0.4 {
                         snake.direction = Direction::South;
                         snake.turned = true;

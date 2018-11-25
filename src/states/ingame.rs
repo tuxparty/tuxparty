@@ -171,14 +171,14 @@ impl game::State for BoardMoveState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        app: &game::App,
+        number_renderer: &game::NumberRenderer,
     ) {
         let transform = self.game.render(
             gl,
             trans,
             BOARD_CENTER,
             0.06,
-            &app.number_renderer,
+            &number_renderer,
             &[self.turn],
         );
         let start = self.game
@@ -196,7 +196,7 @@ impl game::State for BoardMoveState {
             transform,
             gl,
         );
-        app.number_renderer.draw_digit(
+        number_renderer.draw_digit(
             self.remaining as usize,
             1.0,
             &tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
@@ -204,8 +204,8 @@ impl game::State for BoardMoveState {
             gl,
         );
     }
-    fn update(&mut self, app: &mut game::App, time: f64) {
-        self.time += time;
+    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+        self.time += props.time;
         if self.time > self.duration {
             let start = self.game
                 .map
@@ -227,18 +227,18 @@ impl game::State for BoardMoveState {
             if self.remaining > 1 {
                 let end = self.game.map.get_space(transition.to).unwrap();
                 if end.transitions.len() > 1 {
-                    app.goto_state(TransitionChoiceState::new(
+                    return game::UpdateResult::NewState(Box::new(TransitionChoiceState::new(
                         new_game_state,
                         self.turn,
                         self.remaining - 1,
-                    ));
+                    )));
                 } else {
-                    app.goto_state(BoardMoveState::new(
+                    return game::UpdateResult::NewState(Box::new(BoardMoveState::new(
                         new_game_state,
                         0,
                         self.turn,
                         self.remaining - 1,
-                    ));
+                    )));
                 }
             } else {
                 new_game_state.players[self.turn].coins = (i32::from(new_game_state.players[self.turn].coins)
@@ -252,13 +252,15 @@ impl game::State for BoardMoveState {
                         board::SpaceType::Negative => -(3 as i8),
                     }))
                     .max(0) as u16;
-                app.goto_state(SpaceResultState {
+                return game::UpdateResult::NewState(Box::new(SpaceResultState {
                     game: new_game_state,
                     time: 0.0,
                     turn: self.turn,
-                });
+                }));
             }
         }
+
+        game::UpdateResult::Continue
     }
 }
 
@@ -273,14 +275,14 @@ impl game::State for SpaceResultState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        app: &game::App,
+        number_renderer: &game::NumberRenderer,
     ) {
         let transform = self.game.render(
             gl,
             trans,
             BOARD_CENTER,
             0.06,
-            &app.number_renderer,
+            &number_renderer,
             &[self.turn],
         );
         let player = self.game.players[self.turn];
@@ -293,15 +295,17 @@ impl game::State for SpaceResultState {
             gl,
         );
     }
-    fn update(&mut self, app: &mut game::App, time: f64) {
-        self.time += time;
+    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+        self.time += props.time;
         if self.time > 1.0 {
             if self.turn + 1 < self.game.players.len() {
-                app.goto_state(DieRollState::new(self.game.clone(), self.turn + 1));
+                return game::UpdateResult::NewState(Box::new(DieRollState::new(self.game.clone(), self.turn + 1)));
             } else {
-                app.goto_state(states::minigame::MinigameState::new(self.game.clone()));
+                return game::UpdateResult::NewState(Box::new(states::minigame::MinigameState::new(self.game.clone())));
             }
         }
+
+        game::UpdateResult::Continue
     }
 }
 
@@ -326,30 +330,30 @@ impl DieRollState {
 }
 
 impl game::State for DieRollState {
-    fn update(&mut self, app: &mut game::App, time: f64) {
+    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
         if self.jump {
-            self.time += time * 4.0;
+            self.time += props.time * 4.0;
             if self.time > 2.0 {
                 let space = self.game
                     .map
                     .get_space(self.game.players[self.turn].space)
                     .unwrap();
                 if space.transitions.len() > 1 {
-                    app.goto_state(TransitionChoiceState::new(
+                    return game::UpdateResult::NewState(Box::new(TransitionChoiceState::new(
                         self.game.clone(),
                         self.turn,
                         self.number,
-                    ));
+                    )));
                 } else {
-                    app.goto_state(BoardMoveState::new(
+                    return game::UpdateResult::NewState(Box::new(BoardMoveState::new(
                         self.game.clone(),
                         0,
                         self.turn,
                         self.number,
-                    ));
+                    )));
                 }
             }
-        } else if app.input.is_pressed(
+        } else if props.input.is_pressed(
             &self.game.players[self.turn].player.input,
             tputil::Button::South,
         ) {
@@ -361,19 +365,21 @@ impl game::State for DieRollState {
                 self.number = 1;
             }
         }
+
+        game::UpdateResult::Continue
     }
     fn render(
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        app: &game::App,
+        number_renderer: &game::NumberRenderer,
     ) {
         let transform = self.game.render(
             gl,
             trans,
             BOARD_CENTER,
             0.06,
-            &app.number_renderer,
+            &number_renderer,
             &[self.turn],
         );
         let player = self.game.players[self.turn];
@@ -395,7 +401,7 @@ impl game::State for DieRollState {
         } else {
             2.0
         };
-        app.number_renderer.draw_digit(
+        number_renderer.draw_digit(
             self.number as usize,
             1.0,
             &tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
@@ -426,25 +432,25 @@ impl TransitionChoiceState {
 }
 
 impl game::State for TransitionChoiceState {
-    fn update(&mut self, app: &mut game::App, time: f64) {
-        self.time += time;
+    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+        self.time += props.time;
 
-        if app.input.is_pressed(
+        if props.input.is_pressed(
             &self.game.players[self.turn].player.input,
             tputil::Button::South,
         ) {
-            app.goto_state(BoardMoveState::new(
+            game::UpdateResult::NewState(Box::new(BoardMoveState::new(
                 self.game.clone(),
                 self.selected,
                 self.turn,
                 self.remaining,
-            ));
+            )))
         } else {
-            let input_x = app.input.get_axis(
+            let input_x = props.input.get_axis(
                 &self.game.players[self.turn].player.input,
                 tputil::Axis::LeftStickX,
             );
-            let input_y = -app.input.get_axis(
+            let input_y = -props.input.get_axis(
                 &self.game.players[self.turn].player.input,
                 tputil::Axis::LeftStickY,
             );
@@ -477,20 +483,22 @@ impl game::State for TransitionChoiceState {
                 self.selected = closest.0;
                 println!("{} {}", closest.0, closest.1);
             }
+
+            game::UpdateResult::Continue
         }
     }
     fn render(
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        app: &game::App,
+        number_renderer: &game::NumberRenderer,
     ) {
         let transform = self.game.render(
             gl,
             trans,
             BOARD_CENTER,
             0.06,
-            &app.number_renderer,
+            &number_renderer,
             &[self.turn],
         );
         let player = self.game.players[self.turn];
@@ -518,7 +526,7 @@ impl game::State for TransitionChoiceState {
             graphics::line(COLOR2, 0.2, [p1.x, p1.y, p2.x, p2.y], transform, gl);
             graphics::line(color, 0.15, [p1.x, p1.y, p2.x, p2.y], transform, gl);
         }
-        app.number_renderer.draw_digit(
+        number_renderer.draw_digit(
             self.remaining as usize,
             1.0,
             &tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),

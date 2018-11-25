@@ -44,7 +44,7 @@ impl MGHotRope {
 
 
 impl states::minigame::Minigame for MGHotRope {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _app: &game::App) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _number_renderer: &game::NumberRenderer) {
         let scale = 1.0 / self.players.len() as f64;
         let rope_y = 1.0 - self.rope_time;
         const COLOR1: [f32; 4] = [1.0, 0.5, 0.0, 1.0];
@@ -69,9 +69,9 @@ impl states::minigame::Minigame for MGHotRope {
             );
         }
     }
-    fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
-        self.time += time;
-        self.rope_time += time * self.speed;
+    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
+        self.time += props.time;
+        self.rope_time += props.time * self.speed;
         let mut last_alive: Option<usize> = None;
         let mut more_than_one = false;
 
@@ -88,7 +88,7 @@ impl states::minigame::Minigame for MGHotRope {
                     if self.rope_time > 1.0 && self.rope_time < 1.2 {
                         self.swept_at[i] = self.time - (self.rope_time - 1.0) / self.speed;
                     }
-                    if app.input
+                    if props.input
                         .is_pressed(&self.players[i].input, tputil::Button::South)
                     {
                         self.jumped_at[i] = self.time;

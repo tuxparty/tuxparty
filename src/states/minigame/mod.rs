@@ -28,19 +28,21 @@ impl game::State for MinigameState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        app: &game::App,
+        number_renderer: &game::NumberRenderer,
     ) {
-        self.minigame.render(gl, trans, app);
+        self.minigame.render(gl, trans, number_renderer);
     }
-    fn update(&mut self, app: &mut game::App, time: f64) {
-        let result = self.minigame.update(app, time);
+    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+        let result = self.minigame.update(&props);
         if let Some(result) = result {
             println!("returned from minigame");
             let mut new_game_state = self.game.clone();
             let processed = self.process_result(result);
 
-            app.goto_state(MinigameResultState::new(new_game_state, processed));
+            return game::UpdateResult::NewState(Box::new(MinigameResultState::new(new_game_state, processed)));
         }
+
+        game::UpdateResult::Continue
     }
 }
 
@@ -146,7 +148,7 @@ impl game::State for MinigameResultState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        app: &game::App,
+        number_renderer: &game::NumberRenderer,
     ) {
         let scale = 2.0 / self.game.players.len() as f64;
         for i in 0..self.game.players.len() {
@@ -162,7 +164,7 @@ impl game::State for MinigameResultState {
                 gl,
             );
             let number = self.result[i].to_string();
-            app.number_renderer.draw_str(
+            number_renderer.draw_str(
                 &number,
                 scale,
                 trans.trans(scale - 1.0, scale * i as f64 - 1.0),
@@ -170,15 +172,16 @@ impl game::State for MinigameResultState {
             );
         }
     }
-    fn update(&mut self, app: &mut game::App, time: f64) {
-        self.time += time;
+    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+        self.time += props.time;
         if self.time > 3.0 {
             let mut new_game_state = self.game.clone();
             for (i, player) in new_game_state.players.iter_mut().enumerate() {
                 player.coins = (player.coins as i16 + self.result[i]) as u16;
             }
-            app.goto_state(states::ingame::DieRollState::new(new_game_state, 0));
+            return game::UpdateResult::NewState(Box::new(states::ingame::DieRollState::new(new_game_state, 0)));
         }
+        game::UpdateResult::Continue
     }
 }
 
@@ -187,7 +190,7 @@ pub trait Minigame {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        app: &game::App,
+        number_renderer: &game::NumberRenderer,
     );
-    fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult>;
+    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult>;
 }

@@ -50,9 +50,9 @@ impl MGCastleClimb {
 }
 
 impl states::minigame::Minigame for MGCastleClimb {
-    fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
-        self.time += time;
-        let diff = tputil::Point2D::new(0.0, time * ((-1.0 / (self.time / 50.0 + 1.1)) + 1.0));
+    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
+        self.time += props.time;
+        let diff = tputil::Point2D::new(0.0, props.time * ((-1.0 / (self.time / 50.0 + 1.1)) + 1.0));
         self.blocks = self.blocks
             .iter()
             .map(|block| *block + diff)
@@ -61,11 +61,11 @@ impl states::minigame::Minigame for MGCastleClimb {
         let mut last_alive = None;
         let mut multiple_alive = false;
         for (index, player) in self.players.iter_mut().enumerate() {
-            player.velocity.x = app.input
+            player.velocity.x = props.input
                 .get_axis(&player.player.input, tputil::Axis::LeftStickX)
                 .into();
-            player.position = player.position + diff + player.velocity.multiply_scalar(time);
-            player.velocity.y += MGCastleClimb::GRAVITY * time;
+            player.position = player.position + diff + player.velocity.multiply_scalar(props.time);
+            player.velocity.y += MGCastleClimb::GRAVITY * props.time;
             for block in &self.blocks {
                 if player.position.x + MGCastleClimb::PLAYER_SIZE
                     > block.x - MGCastleClimb::BLOCK_WIDTH
@@ -80,7 +80,7 @@ impl states::minigame::Minigame for MGCastleClimb {
                     player.position.y =
                         block.y - MGCastleClimb::BLOCK_HEIGHT - MGCastleClimb::PLAYER_SIZE;
                     player.velocity.y = 0.0;
-                    if app.input
+                    if props.input
                         .is_pressed(&player.player.input, tputil::Button::South)
                     {
                         player.velocity.y = -MGCastleClimb::JUMP_VEL;
@@ -117,7 +117,7 @@ impl states::minigame::Minigame for MGCastleClimb {
         }
         None
     }
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _app: &game::App) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _number_renderer: &game::NumberRenderer) {
         const COLOR1: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
         for block in &self.blocks {
             graphics::rectangle(

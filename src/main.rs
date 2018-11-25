@@ -26,7 +26,7 @@ fn main() {
 
     let mut app = game::App {
         input: tputil::InputState::new().unwrap(),
-        state: Some(Box::new(states::setup::MenuState {})),
+        state: Box::new(states::setup::MenuState {}),
         number_renderer: game::NumberRenderer::new()
     };
 

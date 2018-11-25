@@ -76,7 +76,7 @@ impl states::minigame::Minigame for MGItemCatch {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        app: &game::App,
+        number_renderer: &game::NumberRenderer,
     ) {
         const COLOR1: graphics::types::Color = [0.7, 0.7, 0.7, 1.0];
         const COLOR2: graphics::types::Color = [1.0, 0.8, 0.0, 1.0];
@@ -110,11 +110,11 @@ impl states::minigame::Minigame for MGItemCatch {
         }
         let time_left = (MGItemCatch::TIME_LIMIT - self.time).ceil() as i8;
         let time_str = format!("{:02}", time_left);
-        app.number_renderer
+        number_renderer
             .draw_str(&time_str, 0.3, trans.trans(-(0.3 * 5.0 / 7.0), -1.0), gl);
     }
-    fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
-        self.time += time;
+    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
+        self.time += props.time;
         if self.time > MGItemCatch::TIME_LIMIT {
             return Some(MinigameResult::Ratios(
                 self.players
@@ -126,15 +126,15 @@ impl states::minigame::Minigame for MGItemCatch {
         }
         for player in self.players.iter_mut() {
             player.velocity.x = f64::from(
-                app.input.get_axis(
+                props.input.get_axis(
                     &player.player.input,
                     tputil::Axis::LeftStickX));
-            player.position += player.velocity.multiply_scalar(time);
-            player.velocity.y += MGItemCatch::GRAVITY * time;
+            player.position += player.velocity.multiply_scalar(props.time);
+            player.velocity.y += MGItemCatch::GRAVITY * props.time;
             if player.position.y >= 0.5 {
                 player.position.y = 0.5;
                 player.velocity.y = 0.0;
-                if app.input
+                if props.input
                     .is_pressed(&player.player.input, tputil::Button::South)
                 {
                     player.velocity.y = -MGItemCatch::JUMP_VEL;
@@ -167,7 +167,7 @@ impl states::minigame::Minigame for MGItemCatch {
             let index = to_remove - i;
             self.items.remove(index);
         }
-        let chance = 1.0 * time;
+        let chance = 1.0 * props.time;
         if rand::thread_rng().next_f64() < chance {
             let side = if rand::thread_rng().gen() { 1.0 } else { -1.0 };
             let start_vel = tputil::Point2D::new(

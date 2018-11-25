@@ -37,7 +37,7 @@ impl MGQuickdraw {
 }
 
 impl states::minigame::Minigame for MGQuickdraw {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _app: &game::App) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _number_renderer: &game::NumberRenderer) {
         let buzzer_color;
         const COLOR1: graphics::types::Color = [1.0, 0.0, 0.0, 1.0];
         const COLOR2: graphics::types::Color = [0.0, 1.0, 0.0, 1.0];
@@ -76,12 +76,12 @@ impl states::minigame::Minigame for MGQuickdraw {
             );
         }
     }
-    fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
-        self.time += time;
+    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
+        self.time += props.time;
         let mut all_dead = true;
         for i in 0..self.players.len() {
             if self.player_buzzes[i] < 0.0 {
-                if app.input
+                if props.input
                     .is_pressed(&self.players[i].input, tputil::Button::South)
                 {
                     if self.time < self.buzz_time {

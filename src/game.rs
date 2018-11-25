@@ -8,7 +8,7 @@ use std;
 
 pub struct App {
     pub input: tputil::InputState,
-    pub state: Option<Box<State>>,
+    pub state: Box<State>,
     pub number_renderer: NumberRenderer
 }
 
@@ -23,28 +23,36 @@ impl App {
         let transform = c.transform
             .trans(f64::from(area[0]) / 2.0, f64::from(area[1]) / 2.0)
             .scale(scale, scale);
-        let state = self.state.take().unwrap();
-        state.render(gl, transform, self);
-        self.state = Some(state);
+        self.state.render(gl, transform, &self.number_renderer);
     }
 
     pub fn update(&mut self, time: f64) {
         self.input.update();
-        let mut state = self.state.take().unwrap();
-        state.update(self, time);
-        if self.state.is_none() {
-            self.state = Some(state);
+        let result = self.state.update(UpdateProps {
+            input: &self.input,
+            time,
+        });
+        match result {
+            UpdateResult::Continue => {},
+            UpdateResult::NewState(new_state) => self.state = new_state,
         }
-    }
-
-    pub fn goto_state<T: State + 'static>(&mut self, new_state: T) {
-        self.state = Some(Box::new(new_state));
     }
 }
 
+pub struct UpdateProps<'a> {
+    pub input: &'a tputil::InputState,
+    pub time: f64,
+}
+
 pub trait State {
-    fn render(&self, &mut opengl_graphics::GlGraphics, graphics::math::Matrix2d, &App);
-    fn update(&mut self, &mut App, f64);
+    fn render(&self, &mut opengl_graphics::GlGraphics, graphics::math::Matrix2d, &NumberRenderer);
+    fn update(&mut self, UpdateProps) -> UpdateResult;
+}
+
+#[must_use]
+pub enum UpdateResult {
+    Continue,
+    NewState(Box<State>),
 }
 
 pub struct NumberRenderer {

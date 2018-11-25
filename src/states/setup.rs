@@ -12,7 +12,7 @@ use rand::Rng;
 pub struct MenuState {}
 
 impl game::State for MenuState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _: &game::App) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _: &game::NumberRenderer) {
         const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         graphics::rectangle(
             COLOR1,
@@ -21,11 +21,13 @@ impl game::State for MenuState {
             gl,
         );
     }
-    fn update(&mut self, app: &mut game::App, _time: f64) {
-        let pressed = app.input.get_pressed_any(tputil::Button::South);
+    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+        let pressed = props.input.get_pressed_any(tputil::Button::South);
         if !pressed.is_empty() {
-            app.goto_state(JoinState::new());
+            return game::UpdateResult::NewState(Box::new(JoinState::new()));
         }
+
+        game::UpdateResult::Continue
     }
 }
 
@@ -71,7 +73,7 @@ impl JoinState {
 }
 
 impl game::State for JoinState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _: &game::App) {
+    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _: &game::NumberRenderer) {
         const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         let count = self.players.len();
         let scale = 2.0 / (count + 1) as f64;
@@ -93,8 +95,8 @@ impl game::State for JoinState {
             );
         }
     }
-    fn update(&mut self, app: &mut game::App, time: f64) {
-        let joining = app.input.get_pressed_any(tputil::Button::South);
+    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+        let joining = props.input.get_pressed_any(tputil::Button::South);
         for p in joining {
             if self.players.len() >= tputil::COLORS.len() {
                 continue;
@@ -120,23 +122,26 @@ impl game::State for JoinState {
             self.players.push(JoinStatePlayer::new(p, color));
         }
         for player in &mut self.players {
-            let movement = app.input.get_axis(&player.player.input, tputil::Axis::LeftStickX);
-            player.rotation += f64::from(movement) * time * 3.0;
+            let movement = props.input.get_axis(&player.player.input, tputil::Axis::LeftStickX);
+            player.rotation += f64::from(movement) * props.time * 3.0;
         }
 
         self.players.retain(|p| {
-            !app.input.is_pressed(&p.player.input, tputil::Button::East)
-                || app.input.is_pressed(&p.player.input, tputil::Button::South)
+            !props.input.is_pressed(&p.player.input, tputil::Button::East)
+                || props.input.is_pressed(&p.player.input, tputil::Button::South)
         });
 
-        if !app.input.get_pressed_any(tputil::Button::Start).is_empty() {
+        if !props.input.get_pressed_any(tputil::Button::Start).is_empty() {
             let players: Vec<states::ingame::PlayerInfo> = self.players
                 .iter()
                 .map(|player| states::ingame::PlayerInfo::from(*player))
                 .collect();
             let board = board::Board::get_default_board();
             let game = states::ingame::GameInfo::new(players, board);
-            app.goto_state(states::ingame::DieRollState::new(game, 0));
+
+            return game::UpdateResult::NewState(Box::new(states::ingame::DieRollState::new(game, 0)));
         }
+
+        game::UpdateResult::Continue
     }
 }

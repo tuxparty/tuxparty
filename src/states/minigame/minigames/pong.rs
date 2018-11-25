@@ -83,7 +83,7 @@ impl states::minigame::Minigame for MGPong {
     &self,
     gl: &mut opengl_graphics::GlGraphics,
     trans: graphics::math::Matrix2d,
-    _app: &game::App,
+    _: &game::NumberRenderer,
   ) {
     const COLOR1: graphics::types::Color = [0.0, 0.0, 0.0, 1.0];
     const COLOR2: graphics::types::Color = [0.7, 0.7, 0.7, 1.0];
@@ -156,9 +156,9 @@ impl states::minigame::Minigame for MGPong {
     graphics::rectangle(COLOR2, [-1.0, -1.1, 2.0, 0.1], trans, gl);
     graphics::rectangle(COLOR2, [-1.0, 1.0, 2.0, 0.1], trans, gl);
   }
-  fn update(&mut self, app: &game::App, time: f64) -> Option<MinigameResult> {
-    self.time += time;
-    self.ball_pos += self.ball_vel.multiply_scalar(time);
+  fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
+    self.time += props.time;
+    self.ball_pos += self.ball_vel.multiply_scalar(props.time);
     let mut multiple_left = false;
     let mut survivor: Option<usize> = None;
     for i in 0..4 {
@@ -183,7 +183,7 @@ impl states::minigame::Minigame for MGPong {
         }
         let last_pos = self.ball_pos;
         player.position = (player.position
-          + f64::from(app.input.get_axis(&player.player.input, axis)) * scale)
+          + f64::from(props.input.get_axis(&player.player.input, axis)) * scale)
           .max(-1.0 + PADDLE_WIDTH / 2.0)
           .min(1.0 - PADDLE_WIDTH / 2.0);
         if i == 0 {

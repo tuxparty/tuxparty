@@ -1,16 +1,16 @@
-use game;
-use tputil;
 use board;
+use game;
 use states;
+use tputil;
 
 use graphics;
 use opengl_graphics;
-use std;
 use rand;
+use std;
 
 use graphics::Transformed;
-use std::f64::consts::PI;
 use rand::Rng;
+use std::f64::consts::PI;
 
 #[derive(Clone, Copy)]
 pub struct PlayerInfo {
@@ -64,7 +64,13 @@ impl GameInfo {
         for start in &self.map.spaces {
             for transition in start.transitions.iter() {
                 let end = self.map.get_space(transition.to).unwrap();
-                graphics::line(COLOR4, 0.2, [start.pos.x, start.pos.y, end.pos.x, end.pos.y], transform, gl);
+                graphics::line(
+                    COLOR4,
+                    0.2,
+                    [start.pos.x, start.pos.y, end.pos.x, end.pos.y],
+                    transform,
+                    gl,
+                );
             }
         }
         for space in &self.map.spaces {
@@ -130,8 +136,18 @@ impl GameInfo {
                 trans,
                 gl,
             );
-            number_renderer.draw_str(&coins, text_size, trans.trans(x + coin_text_x, y + text_size / 2.0), gl);
-            number_renderer.draw_str(&stars, text_size, trans.trans(x + star_text_x, y + text_size * 1.5), gl);
+            number_renderer.draw_str(
+                &coins,
+                text_size,
+                trans.trans(x + coin_text_x, y + text_size / 2.0),
+                gl,
+            );
+            number_renderer.draw_str(
+                &stars,
+                text_size,
+                trans.trans(x + star_text_x, y + text_size * 1.5),
+                gl,
+            );
         }
         transform
     }
@@ -150,7 +166,8 @@ impl BoardMoveState {
     pub fn new(info: GameInfo, transition: usize, turn: usize, remaining: u8) -> Self {
         let duration = {
             let start_space = info.map.get_space(info.players[turn].space).unwrap();
-            let end_space = info.map
+            let end_space = info
+                .map
                 .get_space(start_space.transitions[transition].to)
                 .unwrap();
             tputil::Point2D::dist(start_space.pos, end_space.pos) / 5.0
@@ -181,7 +198,8 @@ impl game::State for BoardMoveState {
             &number_renderer,
             &[self.turn],
         );
-        let start = self.game
+        let start = self
+            .game
             .map
             .get_space(self.game.players[self.turn].space)
             .unwrap();
@@ -207,7 +225,8 @@ impl game::State for BoardMoveState {
     fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
         self.time += props.time;
         if self.time > self.duration {
-            let start = self.game
+            let start = self
+                .game
                 .map
                 .get_space(self.game.players[self.turn].space)
                 .unwrap();
@@ -241,16 +260,20 @@ impl game::State for BoardMoveState {
                     )));
                 }
             } else {
-                new_game_state.players[self.turn].coins = (i32::from(new_game_state.players[self.turn].coins)
-                    + i32::from(match self.game
-                        .map
-                        .get_space(new_game_state.players[self.turn].space)
-                        .unwrap()
-                        .space_type
-                    {
-                        board::SpaceType::Positive => 3,
-                        board::SpaceType::Negative => -(3 as i8),
-                    }))
+                new_game_state.players[self.turn].coins =
+                    (i32::from(new_game_state.players[self.turn].coins)
+                        + i32::from(
+                            match self
+                                .game
+                                .map
+                                .get_space(new_game_state.players[self.turn].space)
+                                .unwrap()
+                                .space_type
+                            {
+                                board::SpaceType::Positive => 3,
+                                board::SpaceType::Negative => -(3 as i8),
+                            },
+                        ))
                     .max(0) as u16;
                 return game::UpdateResult::NewState(Box::new(SpaceResultState {
                     game: new_game_state,
@@ -299,9 +322,14 @@ impl game::State for SpaceResultState {
         self.time += props.time;
         if self.time > 1.0 {
             if self.turn + 1 < self.game.players.len() {
-                return game::UpdateResult::NewState(Box::new(DieRollState::new(self.game.clone(), self.turn + 1)));
+                return game::UpdateResult::NewState(Box::new(DieRollState::new(
+                    self.game.clone(),
+                    self.turn + 1,
+                )));
             } else {
-                return game::UpdateResult::NewState(Box::new(states::minigame::MinigameState::new(self.game.clone())));
+                return game::UpdateResult::NewState(Box::new(
+                    states::minigame::MinigameState::new(self.game.clone()),
+                ));
             }
         }
 
@@ -334,7 +362,8 @@ impl game::State for DieRollState {
         if self.jump {
             self.time += props.time * 4.0;
             if self.time > 2.0 {
-                let space = self.game
+                let space = self
+                    .game
                     .map
                     .get_space(self.game.players[self.turn].space)
                     .unwrap();
@@ -457,7 +486,8 @@ impl game::State for TransitionChoiceState {
             if input_x.abs() > 0.5 || input_y.abs() > 0.5 {
                 let user_angle = f64::from(input_y.atan2(input_x));
                 println!("user_angle {}", user_angle);
-                let space = self.game
+                let space = self
+                    .game
                     .map
                     .get_space(self.game.players[self.turn].space)
                     .unwrap();

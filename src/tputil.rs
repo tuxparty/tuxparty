@@ -1,9 +1,9 @@
-use std;
 use gilrs;
-use piston;
-use graphics;
 pub use gilrs::Axis;
 pub use gilrs::Button;
+use graphics;
+use piston;
+use std;
 
 use graphics::Transformed;
 
@@ -36,7 +36,7 @@ impl std::ops::Sub for Point2D {
     fn sub(self, rhs: Point2D) -> Self::Output {
         Point2D {
             x: self.x - rhs.x,
-            y: self.y - rhs.y
+            y: self.y - rhs.y,
         }
     }
 }
@@ -46,7 +46,7 @@ impl std::ops::Add for Point2D {
     fn add(self, rhs: Point2D) -> Self::Output {
         Point2D {
             x: self.x + rhs.x,
-            y: self.y + rhs.y
+            y: self.y + rhs.y,
         }
     }
 }
@@ -71,7 +71,7 @@ impl Point2D {
     pub fn multiply_scalar(&self, a: f64) -> Self {
         Point2D {
             x: self.x * a,
-            y: self.y * a
+            y: self.y * a,
         }
     }
     pub fn new(x: f64, y: f64) -> Self {
@@ -109,7 +109,7 @@ const KEYBOARD: InputMethod = InputMethod {
 #[derive(Clone, Copy)]
 pub struct Player {
     pub input: InputMethod,
-    pub color: usize
+    pub color: usize,
 }
 
 pub struct Alignment(pub AlignmentX, pub AlignmentY);
@@ -119,34 +119,41 @@ impl Alignment {
     fn get_offset_x(&self, width: f64) -> f64 {
         match self.0 {
             AlignmentX::Left => 0.0,
-            AlignmentX::Center => -width/2.0,
-            AlignmentX::Right => -width
+            AlignmentX::Center => -width / 2.0,
+            AlignmentX::Right => -width,
         }
     }
     fn get_offset_y(&self, height: f64) -> f64 {
         match self.1 {
             AlignmentY::Top => 0.0,
-            AlignmentY::Middle => -height/2.0,
-            AlignmentY::Bottom => -height
+            AlignmentY::Middle => -height / 2.0,
+            AlignmentY::Bottom => -height,
         }
     }
     fn get_offset(&self, width: f64, height: f64) -> Point2D {
         Point2D::new(self.get_offset_x(width), self.get_offset_y(height))
     }
-    pub fn align(&self, matrix: graphics::math::Matrix2d, width: f64, height: f64) -> graphics::math::Matrix2d {
+    pub fn align(
+        &self,
+        matrix: graphics::math::Matrix2d,
+        width: f64,
+        height: f64,
+    ) -> graphics::math::Matrix2d {
         let offset = self.get_offset(width, height);
         matrix.trans(offset.x, offset.y)
     }
 }
 
 pub enum AlignmentX {
-    Left, Center, Right
+    Left,
+    Center,
+    Right,
 }
 
 pub enum AlignmentY {
     Top,
     Middle,
-    Bottom
+    Bottom,
 }
 
 pub struct InputState {
@@ -167,8 +174,7 @@ impl InputState {
             InputType::Gamepad => {
                 if self.backend[ctl.id].status() == gilrs::Status::Disconnected {
                     0.0
-                }
-                else {
+                } else {
                     let value = self.backend[ctl.id].value(axis);
                     value
                 }
@@ -178,8 +184,7 @@ impl InputState {
                     (match self.keyboard_state.get(&piston::input::Key::Left) {
                         Some(_) => -1.0,
                         _ => 0.0,
-                    }
-                    + match self.keyboard_state.get(&piston::input::Key::Right) {
+                    } + match self.keyboard_state.get(&piston::input::Key::Right) {
                         Some(_) => 1.0,
                         _ => 0.0,
                     })
@@ -188,8 +193,7 @@ impl InputState {
                     (match self.keyboard_state.get(&piston::input::Key::Up) {
                         Some(_) => 1.0,
                         _ => 0.0,
-                    }
-                    + match self.keyboard_state.get(&piston::input::Key::Down) {
+                    } + match self.keyboard_state.get(&piston::input::Key::Down) {
                         Some(_) => -1.0,
                         _ => 0.0,
                     })

@@ -2,9 +2,9 @@ use graphics;
 use opengl_graphics;
 use rand;
 
-use tputil;
-use states;
 use game;
+use states;
+use tputil;
 
 use graphics::Transformed;
 use rand::Rng;
@@ -44,10 +44,11 @@ impl MGSnake {
                         head,
                         (
                             head.0,
-                            head.1 + match i % 2 {
-                                0 => 1,
-                                _ => -1,
-                            },
+                            head.1
+                                + match i % 2 {
+                                    0 => 1,
+                                    _ => -1,
+                                },
                         ),
                     ],
                     direction: match i % 2 {
@@ -68,7 +69,12 @@ impl MGSnake {
 }
 
 impl states::minigame::Minigame for MGSnake {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _number_renderer: &game::NumberRenderer) {
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        _number_renderer: &game::NumberRenderer,
+    ) {
         const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         graphics::rectangle(
             COLOR1,
@@ -82,7 +88,12 @@ impl states::minigame::Minigame for MGSnake {
             const COLOR2: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
             graphics::rectangle(
                 COLOR2,
-                [f64::from(pellet.0) + 0.1, f64::from(pellet.1) + 0.1, 0.8, 0.8],
+                [
+                    f64::from(pellet.0) + 0.1,
+                    f64::from(pellet.1) + 0.1,
+                    0.8,
+                    0.8,
+                ],
                 transform,
                 gl,
             );
@@ -105,7 +116,8 @@ impl states::minigame::Minigame for MGSnake {
         for snake in self.snakes.iter_mut() {
             if !snake.turned {
                 if snake.direction == Direction::North || snake.direction == Direction::South {
-                    let axis = props.input
+                    let axis = props
+                        .input
                         .get_axis(&snake.player.input, tputil::Axis::LeftStickX);
                     if axis < -0.4 {
                         snake.direction = Direction::West;
@@ -115,7 +127,8 @@ impl states::minigame::Minigame for MGSnake {
                         snake.turned = true;
                     }
                 } else if snake.direction == Direction::West || snake.direction == Direction::East {
-                    let axis = props.input
+                    let axis = props
+                        .input
                         .get_axis(&snake.player.input, tputil::Axis::LeftStickY);
                     if axis < -0.4 {
                         snake.direction = Direction::South;
@@ -179,7 +192,8 @@ impl states::minigame::Minigame for MGSnake {
                     continue;
                 }
                 let head = snake.tail[snake.tail.len() - 1];
-                let mut dies = head.0 < 0 || head.1 < 0
+                let mut dies = head.0 < 0
+                    || head.1 < 0
                     || head.0 >= MGSnake::GRID_SIZE
                     || head.1 >= MGSnake::GRID_SIZE;
                 if !dies {

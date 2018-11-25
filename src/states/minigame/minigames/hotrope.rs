@@ -1,11 +1,11 @@
-use std;
 use graphics;
 use opengl_graphics;
 use rand;
+use std;
 
-use tputil;
-use states;
 use game;
+use states;
+use tputil;
 
 use rand::Rng;
 use states::minigame::MinigameResult;
@@ -42,9 +42,13 @@ impl MGHotRope {
     }
 }
 
-
 impl states::minigame::Minigame for MGHotRope {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _number_renderer: &game::NumberRenderer) {
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        _number_renderer: &game::NumberRenderer,
+    ) {
         let scale = 1.0 / self.players.len() as f64;
         let rope_y = 1.0 - self.rope_time;
         const COLOR1: [f32; 4] = [1.0, 0.5, 0.0, 1.0];
@@ -88,7 +92,8 @@ impl states::minigame::Minigame for MGHotRope {
                     if self.rope_time > 1.0 && self.rope_time < 1.2 {
                         self.swept_at[i] = self.time - (self.rope_time - 1.0) / self.speed;
                     }
-                    if props.input
+                    if props
+                        .input
                         .is_pressed(&self.players[i].input, tputil::Button::South)
                     {
                         self.jumped_at[i] = self.time;
@@ -108,7 +113,7 @@ impl states::minigame::Minigame for MGHotRope {
         }
         match last_alive {
             None => Some(MinigameResult::Nothing),
-            Some(winner) => Some(MinigameResult::Winner(winner))
+            Some(winner) => Some(MinigameResult::Winner(winner)),
         }
     }
 }

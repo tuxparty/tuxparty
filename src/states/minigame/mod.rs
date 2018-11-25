@@ -1,15 +1,15 @@
 mod minigames;
 
 use game;
-use opengl_graphics;
 use graphics;
+use opengl_graphics;
 use rand;
+use states;
 use std;
 use tputil;
-use states;
 
-use rand::Rng;
 use graphics::Transformed;
+use rand::Rng;
 
 pub enum MinigameResult {
     Nothing,
@@ -39,7 +39,10 @@ impl game::State for MinigameState {
             let mut new_game_state = self.game.clone();
             let processed = self.process_result(result);
 
-            return game::UpdateResult::NewState(Box::new(MinigameResultState::new(new_game_state, processed)));
+            return game::UpdateResult::NewState(Box::new(MinigameResultState::new(
+                new_game_state,
+                processed,
+            )));
         }
 
         game::UpdateResult::Continue
@@ -50,13 +53,15 @@ impl MinigameState {
     const MINIGAME_COINS: i16 = 10;
     fn process_result(&self, result: MinigameResult) -> Box<[i16]> {
         match result {
-            MinigameResult::Nothing => self.game
+            MinigameResult::Nothing => self
+                .game
                 .players
                 .iter()
                 .map(|_| 0)
                 .collect::<std::vec::Vec<i16>>()
                 .into_boxed_slice(),
-            MinigameResult::Winner(index) => self.game
+            MinigameResult::Winner(index) => self
+                .game
                 .players
                 .iter()
                 .enumerate()
@@ -71,7 +76,8 @@ impl MinigameState {
                 .into_boxed_slice(),
             MinigameResult::Tie(indices) => {
                 let amount = MinigameState::MINIGAME_COINS / indices.len() as i16;
-                let mut tr = self.game
+                let mut tr = self
+                    .game
                     .players
                     .iter()
                     .map(|_| 0)
@@ -84,7 +90,9 @@ impl MinigameState {
             }
             MinigameResult::Ratios(ratios) => {
                 println!("{:?}", ratios);
-                let total = ratios.iter().fold(0.0, |a, b| a + b.max(0.0))
+                let total = ratios
+                    .iter()
+                    .fold(0.0, |a, b| a + b.max(0.0))
                     .max(-ratios.iter().fold(0.0, |a, b| a + b.min(0.0)));
                 let scale = if total == 0.0 {
                     1.0
@@ -95,7 +103,11 @@ impl MinigameState {
                 ratios
                     .iter()
                     .enumerate()
-                    .map(|(i, x)| (x * scale).max(-f64::from(self.game.players[i].coins)).trunc() as i16)
+                    .map(|(i, x)| {
+                        (x * scale)
+                            .max(-f64::from(self.game.players[i].coins))
+                            .trunc() as i16
+                    })
                     .collect::<std::vec::Vec<i16>>()
                     .into_boxed_slice()
             }
@@ -104,7 +116,8 @@ impl MinigameState {
     pub fn new(game: states::ingame::GameInfo) -> MinigameState {
         let slice;
         {
-            slice = game.players
+            slice = game
+                .players
                 .clone()
                 .into_iter()
                 .map(|player| player.player)
@@ -179,7 +192,10 @@ impl game::State for MinigameResultState {
             for (i, player) in new_game_state.players.iter_mut().enumerate() {
                 player.coins = (player.coins as i16 + self.result[i]) as u16;
             }
-            return game::UpdateResult::NewState(Box::new(states::ingame::DieRollState::new(new_game_state, 0)));
+            return game::UpdateResult::NewState(Box::new(states::ingame::DieRollState::new(
+                new_game_state,
+                0,
+            )));
         }
         game::UpdateResult::Continue
     }

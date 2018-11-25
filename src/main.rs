@@ -1,7 +1,7 @@
-mod game;
-mod tputil;
-mod states;
 mod board;
+mod game;
+mod states;
+mod tputil;
 extern crate gilrs;
 extern crate graphics;
 extern crate opengl_graphics;
@@ -9,8 +9,8 @@ extern crate piston;
 extern crate rand;
 extern crate sdl2_window;
 
+use piston::input::{PressEvent, ReleaseEvent, RenderEvent, UpdateEvent};
 use sdl2_window::Sdl2Window as Window;
-use piston::input::{RenderEvent, UpdateEvent, PressEvent, ReleaseEvent};
 
 fn main() {
     let gl_version = opengl_graphics::OpenGL::V2_1;
@@ -27,7 +27,7 @@ fn main() {
     let mut app = game::App {
         input: tputil::InputState::new().unwrap(),
         state: Box::new(states::setup::MenuState {}),
-        number_renderer: game::NumberRenderer::new()
+        number_renderer: game::NumberRenderer::new(),
     };
 
     let mut events = piston::event_loop::Events::new(piston::event_loop::EventSettings::new());
@@ -39,8 +39,7 @@ fn main() {
         if let Some(u) = e.update_args() {
             let multiplier = if app.input.is_key_pressed(&piston::input::keyboard::Key::F4) {
                 3.0
-            }
-            else {
+            } else {
                 1.0
             };
             app.update(u.dt * multiplier);

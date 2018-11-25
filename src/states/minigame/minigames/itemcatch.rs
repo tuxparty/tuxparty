@@ -1,14 +1,14 @@
-use std;
 use graphics;
 use opengl_graphics;
 use rand;
+use std;
 
-use tputil;
-use states;
 use game;
+use states;
+use tputil;
 
-use rand::Rng;
 use graphics::Transformed;
+use rand::Rng;
 use states::minigame::MinigameResult;
 
 struct ICPlayer {
@@ -51,13 +51,11 @@ impl MGItemCatch {
         MGItemCatch {
             players: players
                 .iter()
-                .map(|player| {
-                    ICPlayer {
-                        player: *player,
-                        position: tputil::Point2D::ZERO,
-                        velocity: tputil::Point2D::ZERO,
-                        points: 0,
-                    }
+                .map(|player| ICPlayer {
+                    player: *player,
+                    position: tputil::Point2D::ZERO,
+                    velocity: tputil::Point2D::ZERO,
+                    points: 0,
                 })
                 .collect::<std::vec::Vec<ICPlayer>>()
                 .into_boxed_slice(),
@@ -110,8 +108,7 @@ impl states::minigame::Minigame for MGItemCatch {
         }
         let time_left = (MGItemCatch::TIME_LIMIT - self.time).ceil() as i8;
         let time_str = format!("{:02}", time_left);
-        number_renderer
-            .draw_str(&time_str, 0.3, trans.trans(-(0.3 * 5.0 / 7.0), -1.0), gl);
+        number_renderer.draw_str(&time_str, 0.3, trans.trans(-(0.3 * 5.0 / 7.0), -1.0), gl);
     }
     fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
         self.time += props.time;
@@ -126,15 +123,17 @@ impl states::minigame::Minigame for MGItemCatch {
         }
         for player in self.players.iter_mut() {
             player.velocity.x = f64::from(
-                props.input.get_axis(
-                    &player.player.input,
-                    tputil::Axis::LeftStickX));
+                props
+                    .input
+                    .get_axis(&player.player.input, tputil::Axis::LeftStickX),
+            );
             player.position += player.velocity.multiply_scalar(props.time);
             player.velocity.y += MGItemCatch::GRAVITY * props.time;
             if player.position.y >= 0.5 {
                 player.position.y = 0.5;
                 player.velocity.y = 0.0;
-                if props.input
+                if props
+                    .input
                     .is_pressed(&player.player.input, tputil::Button::South)
                 {
                     player.velocity.y = -MGItemCatch::JUMP_VEL;
@@ -174,10 +173,8 @@ impl states::minigame::Minigame for MGItemCatch {
                 rand::thread_rng().next_f64().sqrt() * 2.0 * -side,
                 -rand::thread_rng().next_f64().sqrt(),
             );
-            let start_pos = tputil::Point2D::new(
-                1.25 * side,
-                rand::thread_rng().next_f64() * 1.5 - 1.5,
-            );
+            let start_pos =
+                tputil::Point2D::new(1.25 * side, rand::thread_rng().next_f64() * 1.5 - 1.5);
             let value = if rand::thread_rng().gen() { 1 } else { -1 };
 
             self.items.push(ICItem {

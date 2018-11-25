@@ -1,10 +1,10 @@
+use board;
 use game;
-use tputil;
-use opengl_graphics;
 use graphics;
+use opengl_graphics;
 use rand;
 use states;
-use board;
+use tputil;
 
 use graphics::Transformed;
 use rand::Rng;
@@ -12,7 +12,12 @@ use rand::Rng;
 pub struct MenuState {}
 
 impl game::State for MenuState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _: &game::NumberRenderer) {
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        _: &game::NumberRenderer,
+    ) {
         const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         graphics::rectangle(
             COLOR1,
@@ -43,8 +48,8 @@ impl JoinStatePlayer {
             rotation: 0.0,
             player: tputil::Player {
                 input: player,
-                color: color
-            }
+                color: color,
+            },
         }
     }
 }
@@ -55,7 +60,7 @@ impl From<JoinStatePlayer> for states::ingame::PlayerInfo {
             player: player.player,
             space: 0,
             coins: 0,
-            stars: 0
+            stars: 0,
         }
     }
 }
@@ -73,7 +78,12 @@ impl JoinState {
 }
 
 impl game::State for JoinState {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _: &game::NumberRenderer) {
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        _: &game::NumberRenderer,
+    ) {
         const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         let count = self.players.len();
         let scale = 2.0 / (count + 1) as f64;
@@ -114,7 +124,10 @@ impl game::State for JoinState {
             let color;
             let mut colors: Vec<usize> = (0..tputil::COLORS.len()).collect();
             for player in &self.players {
-                if let Some(pos) = (&colors).into_iter().position(|&c| c == player.player.color) {
+                if let Some(pos) = (&colors)
+                    .into_iter()
+                    .position(|&c| c == player.player.color)
+                {
                     colors.remove(pos);
                 }
             }
@@ -122,24 +135,37 @@ impl game::State for JoinState {
             self.players.push(JoinStatePlayer::new(p, color));
         }
         for player in &mut self.players {
-            let movement = props.input.get_axis(&player.player.input, tputil::Axis::LeftStickX);
+            let movement = props
+                .input
+                .get_axis(&player.player.input, tputil::Axis::LeftStickX);
             player.rotation += f64::from(movement) * props.time * 3.0;
         }
 
         self.players.retain(|p| {
-            !props.input.is_pressed(&p.player.input, tputil::Button::East)
-                || props.input.is_pressed(&p.player.input, tputil::Button::South)
+            !props
+                .input
+                .is_pressed(&p.player.input, tputil::Button::East)
+                || props
+                    .input
+                    .is_pressed(&p.player.input, tputil::Button::South)
         });
 
-        if !props.input.get_pressed_any(tputil::Button::Start).is_empty() {
-            let players: Vec<states::ingame::PlayerInfo> = self.players
+        if !props
+            .input
+            .get_pressed_any(tputil::Button::Start)
+            .is_empty()
+        {
+            let players: Vec<states::ingame::PlayerInfo> = self
+                .players
                 .iter()
                 .map(|player| states::ingame::PlayerInfo::from(*player))
                 .collect();
             let board = board::Board::get_default_board();
             let game = states::ingame::GameInfo::new(players, board);
 
-            return game::UpdateResult::NewState(Box::new(states::ingame::DieRollState::new(game, 0)));
+            return game::UpdateResult::NewState(Box::new(states::ingame::DieRollState::new(
+                game, 0,
+            )));
         }
 
         game::UpdateResult::Continue

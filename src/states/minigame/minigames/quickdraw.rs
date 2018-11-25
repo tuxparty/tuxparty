@@ -3,9 +3,9 @@ use opengl_graphics;
 use rand;
 use std;
 
+use game;
 use states;
 use tputil;
-use game;
 
 use graphics::Transformed;
 use rand::Rng;
@@ -37,7 +37,12 @@ impl MGQuickdraw {
 }
 
 impl states::minigame::Minigame for MGQuickdraw {
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _number_renderer: &game::NumberRenderer) {
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        _number_renderer: &game::NumberRenderer,
+    ) {
         let buzzer_color;
         const COLOR1: graphics::types::Color = [1.0, 0.0, 0.0, 1.0];
         const COLOR2: graphics::types::Color = [0.0, 1.0, 0.0, 1.0];
@@ -81,7 +86,8 @@ impl states::minigame::Minigame for MGQuickdraw {
         let mut all_dead = true;
         for i in 0..self.players.len() {
             if self.player_buzzes[i] < 0.0 {
-                if props.input
+                if props
+                    .input
                     .is_pressed(&self.players[i].input, tputil::Button::South)
                 {
                     if self.time < self.buzz_time {
@@ -96,8 +102,7 @@ impl states::minigame::Minigame for MGQuickdraw {
         }
         if all_dead {
             Some(MinigameResult::Nothing)
-        }
-        else {
+        } else {
             None
         }
     }

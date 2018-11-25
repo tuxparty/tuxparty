@@ -2,9 +2,9 @@ use graphics;
 use opengl_graphics;
 use rand;
 
-use tputil;
-use states;
 use game;
+use states;
+use tputil;
 
 use rand::Rng;
 use states::minigame::MinigameResult;
@@ -27,12 +27,10 @@ impl MGCastleClimb {
             blocks: vec![tputil::Point2D::ZERO],
             players: players
                 .iter()
-                .map(|player| {
-                    CCPlayer {
-                        player: *player,
-                        position: tputil::Point2D::new(0.0, -0.2),
-                        velocity: tputil::Point2D::ZERO,
-                    }
+                .map(|player| CCPlayer {
+                    player: *player,
+                    position: tputil::Point2D::new(0.0, -0.2),
+                    velocity: tputil::Point2D::ZERO,
                 })
                 .collect::<Vec<CCPlayer>>()
                 .into_boxed_slice(),
@@ -52,8 +50,10 @@ impl MGCastleClimb {
 impl states::minigame::Minigame for MGCastleClimb {
     fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
         self.time += props.time;
-        let diff = tputil::Point2D::new(0.0, props.time * ((-1.0 / (self.time / 50.0 + 1.1)) + 1.0));
-        self.blocks = self.blocks
+        let diff =
+            tputil::Point2D::new(0.0, props.time * ((-1.0 / (self.time / 50.0 + 1.1)) + 1.0));
+        self.blocks = self
+            .blocks
             .iter()
             .map(|block| *block + diff)
             .filter(|block| block.y < 2.0)
@@ -61,7 +61,8 @@ impl states::minigame::Minigame for MGCastleClimb {
         let mut last_alive = None;
         let mut multiple_alive = false;
         for (index, player) in self.players.iter_mut().enumerate() {
-            player.velocity.x = props.input
+            player.velocity.x = props
+                .input
                 .get_axis(&player.player.input, tputil::Axis::LeftStickX)
                 .into();
             player.position = player.position + diff + player.velocity.multiply_scalar(props.time);
@@ -80,7 +81,8 @@ impl states::minigame::Minigame for MGCastleClimb {
                     player.position.y =
                         block.y - MGCastleClimb::BLOCK_HEIGHT - MGCastleClimb::PLAYER_SIZE;
                     player.velocity.y = 0.0;
-                    if props.input
+                    if props
+                        .input
                         .is_pressed(&player.player.input, tputil::Button::South)
                     {
                         player.velocity.y = -MGCastleClimb::JUMP_VEL;
@@ -107,7 +109,9 @@ impl states::minigame::Minigame for MGCastleClimb {
                 MGCastleClimb::MAX_HEIGHT,
             );
             let t = (-MGCastleClimb::JUMP_VEL - MGCastleClimb::JUMP_VEL.powf(2.0)
-                + 2.0 * y * MGCastleClimb::GRAVITY) / 2.0 * y;
+                + 2.0 * y * MGCastleClimb::GRAVITY)
+                / 2.0
+                * y;
             let mut x = 1.0 * MGCastleClimb::HORIZ_VEL * t + MGCastleClimb::BLOCK_WIDTH;
             if x + last.x > 1.0 || (last.x - x > -1.0 && rand::thread_rng().gen_weighted_bool(2)) {
                 x = -x;
@@ -117,7 +121,12 @@ impl states::minigame::Minigame for MGCastleClimb {
         }
         None
     }
-    fn render(&self, gl: &mut opengl_graphics::GlGraphics, trans: graphics::math::Matrix2d, _number_renderer: &game::NumberRenderer) {
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        _number_renderer: &game::NumberRenderer,
+    ) {
         const COLOR1: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
         for block in &self.blocks {
             graphics::rectangle(

@@ -3,12 +3,12 @@ use opengl_graphics;
 use rand;
 use std;
 
-use game;
-use states;
-use tputil;
+use crate::game;
+use crate::states;
+use crate::tputil;
 
 use rand::Rng;
-use states::minigame::MinigameResult;
+use crate::states::minigame::MinigameResult;
 
 pub struct MGHotRope {
     players: Vec<tputil::Player>,
@@ -20,7 +20,7 @@ pub struct MGHotRope {
 }
 
 impl MGHotRope {
-    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
+    pub fn init(players: Vec<tputil::Player>) -> Box<dyn states::minigame::Minigame> {
         Box::new(MGHotRope::new(players))
     }
     pub fn new(players: Vec<tputil::Player>) -> Self {
@@ -73,7 +73,7 @@ impl states::minigame::Minigame for MGHotRope {
             );
         }
     }
-    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
+    fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult> {
         self.time += props.time;
         self.rope_time += props.time * self.speed;
         let mut last_alive: Option<usize> = None;

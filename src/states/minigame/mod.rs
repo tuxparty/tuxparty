@@ -1,12 +1,12 @@
 mod minigames;
 
-use game;
+use crate::game;
 use graphics;
 use opengl_graphics;
 use rand;
-use states;
+use crate::states;
 use std;
-use tputil;
+use crate::tputil;
 
 use graphics::Transformed;
 use rand::Rng;
@@ -19,7 +19,7 @@ pub enum MinigameResult {
 }
 
 pub struct MinigameState {
-    minigame: Box<Minigame>,
+    minigame: Box<dyn Minigame>,
     game: states::ingame::GameInfo,
 }
 
@@ -32,11 +32,11 @@ impl game::State for MinigameState {
     ) {
         self.minigame.render(gl, trans, number_renderer);
     }
-    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+    fn update(&mut self, props: game::UpdateProps<'_>) -> game::UpdateResult {
         let result = self.minigame.update(&props);
         if let Some(result) = result {
             println!("returned from minigame");
-            let mut new_game_state = self.game.clone();
+            let new_game_state = self.game.clone();
             let processed = self.process_result(result);
 
             return game::UpdateResult::NewState(Box::new(MinigameResultState::new(
@@ -120,7 +120,7 @@ impl MinigameState {
             .cloned()
             .map(|player| player.player)
             .collect::<Vec<tputil::Player>>();
-        let games_list: Box<[Box<Fn(Vec<tputil::Player>) -> Box<Minigame>>]> = Box::new([
+        let games_list: Box<[Box<dyn Fn(Vec<tputil::Player>) -> Box<dyn Minigame>>]> = Box::new([
             Box::new(minigames::quickdraw::MGQuickdraw::init),
             Box::new(minigames::hotrope::MGHotRope::init),
             Box::new(minigames::snake::MGSnake::init),
@@ -181,7 +181,7 @@ impl game::State for MinigameResultState {
             );
         }
     }
-    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+    fn update(&mut self, props: game::UpdateProps<'_>) -> game::UpdateResult {
         self.time += props.time;
         if self.time > 3.0 {
             let mut new_game_state = self.game.clone();
@@ -204,5 +204,5 @@ pub trait Minigame {
         trans: graphics::math::Matrix2d,
         number_renderer: &game::NumberRenderer,
     );
-    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult>;
+    fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult>;
 }

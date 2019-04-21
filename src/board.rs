@@ -1,4 +1,4 @@
-use tputil;
+use crate::tputil;
 
 pub type SpaceID = usize;
 

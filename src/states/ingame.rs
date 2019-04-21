@@ -1,7 +1,7 @@
-use board;
-use game;
-use states;
-use tputil;
+use crate::board;
+use crate::game;
+use crate::states;
+use crate::tputil;
 
 use graphics;
 use opengl_graphics;
@@ -123,8 +123,8 @@ impl GameInfo {
             let size = 0.4;
             let text_size = size / 3.0;
             let mut x = -1.0;
-            let mut coin_text_x;
-            let mut star_text_x;
+            let coin_text_x;
+            let star_text_x;
             let mut y = -1.0;
             if i == 1 || i == 3 {
                 x = 1.0 - size;
@@ -233,7 +233,7 @@ impl game::State for BoardMoveState {
             gl,
         );
     }
-    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+    fn update(&mut self, props: game::UpdateProps<'_>) -> game::UpdateResult {
         self.time += props.time;
         if self.time > self.duration {
             let start = self
@@ -329,7 +329,7 @@ impl game::State for SpaceResultState {
             gl,
         );
     }
-    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+    fn update(&mut self, props: game::UpdateProps<'_>) -> game::UpdateResult {
         self.time += props.time;
         if self.time > 1.0 {
             if self.turn + 1 < self.game.players.len() {
@@ -369,7 +369,7 @@ impl DieRollState {
 }
 
 impl game::State for DieRollState {
-    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+    fn update(&mut self, props: game::UpdateProps<'_>) -> game::UpdateResult {
         if self.jump {
             self.time += props.time * 4.0;
             if self.time > 2.0 {
@@ -472,7 +472,7 @@ impl TransitionChoiceState {
 }
 
 impl game::State for TransitionChoiceState {
-    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+    fn update(&mut self, props: game::UpdateProps<'_>) -> game::UpdateResult {
         self.time += props.time;
 
         if props.input.is_pressed(

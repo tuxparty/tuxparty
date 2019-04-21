@@ -2,12 +2,12 @@ use graphics;
 use opengl_graphics;
 use rand;
 
-use game;
-use states;
-use tputil;
+use crate::game;
+use crate::states;
+use crate::tputil;
 
 use rand::Rng;
-use states::minigame::MinigameResult;
+use crate::states::minigame::MinigameResult;
 use std::f64::consts::PI;
 
 struct PongPlayer {
@@ -31,7 +31,7 @@ const MAX_BOUNCE_ANGLE: f64 = PI / 3.0;
 const START_SPEED: f64 = 0.8;
 
 impl MGPong {
-    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
+    pub fn init(players: Vec<tputil::Player>) -> Box<dyn states::minigame::Minigame> {
         Box::new(MGPong::new(players))
     }
     pub fn new(players: Vec<tputil::Player>) -> Self {
@@ -148,7 +148,7 @@ impl states::minigame::Minigame for MGPong {
         graphics::rectangle(COLOR2, [-1.0, -1.1, 2.0, 0.1], trans, gl);
         graphics::rectangle(COLOR2, [-1.0, 1.0, 2.0, 0.1], trans, gl);
     }
-    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
+    fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult> {
         self.time += props.time;
         self.ball_pos += self.ball_vel.multiply_scalar(props.time);
         let mut multiple_left = false;

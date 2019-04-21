@@ -3,13 +3,13 @@ use opengl_graphics;
 use rand;
 use std;
 
-use game;
-use states;
-use tputil;
+use crate::game;
+use crate::states;
+use crate::tputil;
 
 use graphics::Transformed;
 use rand::Rng;
-use states::minigame::MinigameResult;
+use crate::states::minigame::MinigameResult;
 
 struct ICPlayer {
     player: tputil::Player,
@@ -44,7 +44,7 @@ pub struct MGItemCatch {
 }
 
 impl MGItemCatch {
-    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
+    pub fn init(players: Vec<tputil::Player>) -> Box<dyn states::minigame::Minigame> {
         Box::new(MGItemCatch::new(players))
     }
     fn new(players: Vec<tputil::Player>) -> Self {
@@ -110,7 +110,7 @@ impl states::minigame::Minigame for MGItemCatch {
         let time_str = format!("{:02}", time_left);
         number_renderer.draw_str(&time_str, 0.3, trans.trans(-(0.3 * 5.0 / 7.0), -1.0), gl);
     }
-    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
+    fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult> {
         self.time += props.time;
         if self.time > MGItemCatch::TIME_LIMIT {
             return Some(MinigameResult::Ratios(

@@ -1,10 +1,10 @@
-use board;
-use game;
+use crate::board;
+use crate::game;
 use graphics;
 use opengl_graphics;
 use rand;
-use states;
-use tputil;
+use crate::states;
+use crate::tputil;
 
 use graphics::Transformed;
 use rand::Rng;
@@ -26,7 +26,7 @@ impl game::State for MenuState {
             gl,
         );
     }
-    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+    fn update(&mut self, props: game::UpdateProps<'_>) -> game::UpdateResult {
         let pressed = props.input.get_pressed_any(tputil::Button::South);
         if !pressed.is_empty() {
             return game::UpdateResult::NewState(Box::new(JoinState::new()));
@@ -94,7 +94,7 @@ impl game::State for JoinState {
             );
         }
     }
-    fn update(&mut self, props: game::UpdateProps) -> game::UpdateResult {
+    fn update(&mut self, props: game::UpdateProps<'_>) -> game::UpdateResult {
         let joining = props.input.get_pressed_any(tputil::Button::South);
         for p in joining {
             if self.players.len() >= tputil::COLORS.len() {

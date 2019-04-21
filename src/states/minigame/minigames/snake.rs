@@ -2,13 +2,13 @@ use graphics;
 use opengl_graphics;
 use rand;
 
-use game;
-use states;
-use tputil;
+use crate::game;
+use crate::states;
+use crate::tputil;
 
 use graphics::Transformed;
 use rand::Rng;
-use states::minigame::MinigameResult;
+use crate::states::minigame::MinigameResult;
 
 #[derive(Eq, PartialEq)]
 enum Direction {
@@ -33,7 +33,7 @@ pub struct MGSnake {
 
 impl MGSnake {
     const GRID_SIZE: i8 = 32;
-    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
+    pub fn init(players: Vec<tputil::Player>) -> Box<dyn states::minigame::Minigame> {
         let count = players.len();
         let scale = MGSnake::GRID_SIZE / count as i8 / 2;
         let snakes: Vec<Snake> = players
@@ -112,7 +112,7 @@ impl states::minigame::Minigame for MGSnake {
             }
         }
     }
-    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
+    fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult> {
         self.unhandled_time += props.time;
 
         for snake in self.snakes.iter_mut() {

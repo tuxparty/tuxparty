@@ -2,12 +2,12 @@ use graphics;
 use opengl_graphics;
 use rand;
 
-use game;
-use states;
-use tputil;
+use crate::game;
+use crate::states;
+use crate::tputil;
 
 use rand::Rng;
-use states::minigame::MinigameResult;
+use crate::states::minigame::MinigameResult;
 
 struct CCPlayer {
     player: tputil::Player,
@@ -22,7 +22,7 @@ pub struct MGCastleClimb {
 }
 
 impl MGCastleClimb {
-    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
+    pub fn init(players: Vec<tputil::Player>) -> Box<dyn states::minigame::Minigame> {
         Box::new(MGCastleClimb {
             blocks: vec![tputil::Point2D::ZERO],
             players: players
@@ -48,7 +48,7 @@ impl MGCastleClimb {
 }
 
 impl states::minigame::Minigame for MGCastleClimb {
-    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
+    fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult> {
         self.time += props.time;
         let diff =
             tputil::Point2D::new(0.0, props.time * ((-1.0 / (self.time / 50.0 + 1.1)) + 1.0));

@@ -3,13 +3,13 @@ use opengl_graphics;
 use rand;
 use std;
 
-use game;
-use states;
-use tputil;
+use crate::game;
+use crate::states;
+use crate::tputil;
 
 use graphics::Transformed;
 use rand::Rng;
-use states::minigame::MinigameResult;
+use crate::states::minigame::MinigameResult;
 
 pub struct MGQuickdraw {
     players: Vec<tputil::Player>,
@@ -19,7 +19,7 @@ pub struct MGQuickdraw {
 }
 
 impl MGQuickdraw {
-    pub fn init(players: Vec<tputil::Player>) -> Box<states::minigame::Minigame> {
+    pub fn init(players: Vec<tputil::Player>) -> Box<dyn states::minigame::Minigame> {
         Box::new(MGQuickdraw::new(players))
     }
     fn new(players: Vec<tputil::Player>) -> MGQuickdraw {
@@ -81,7 +81,7 @@ impl states::minigame::Minigame for MGQuickdraw {
             );
         }
     }
-    fn update(&mut self, props: &game::UpdateProps) -> Option<MinigameResult> {
+    fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult> {
         self.time += props.time;
         let mut all_dead = true;
         for i in 0..self.players.len() {

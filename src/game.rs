@@ -1,14 +1,14 @@
-extern crate graphics;
-extern crate image;
-extern crate opengl_graphics;
+use graphics;
+use image;
+use opengl_graphics;
 
 use graphics::Transformed;
 use std;
-use tputil;
+use crate::tputil;
 
 pub struct App {
     pub input: tputil::InputState,
-    pub state: Box<State>,
+    pub state: Box<dyn State>,
     pub number_renderer: NumberRenderer,
 }
 
@@ -46,14 +46,14 @@ pub struct UpdateProps<'a> {
 }
 
 pub trait State {
-    fn render(&self, &mut opengl_graphics::GlGraphics, graphics::math::Matrix2d, &NumberRenderer);
-    fn update(&mut self, UpdateProps) -> UpdateResult;
+    fn render(&self, _: &mut opengl_graphics::GlGraphics, _: graphics::math::Matrix2d, _: &NumberRenderer);
+    fn update(&mut self, _: UpdateProps<'_>) -> UpdateResult;
 }
 
 #[must_use]
 pub enum UpdateResult {
     Continue,
-    NewState(Box<State>),
+    NewState(Box<dyn State>),
 }
 
 pub struct NumberRenderer {

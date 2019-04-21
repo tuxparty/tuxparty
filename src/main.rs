@@ -2,12 +2,12 @@ mod board;
 mod game;
 mod states;
 mod tputil;
-extern crate gilrs;
-extern crate graphics;
-extern crate opengl_graphics;
-extern crate piston;
-extern crate rand;
-extern crate sdl2_window;
+
+
+use opengl_graphics;
+use piston;
+
+
 
 use piston::input::{PressEvent, ReleaseEvent, RenderEvent, UpdateEvent};
 use sdl2_window::Sdl2Window as Window;

@@ -113,7 +113,7 @@ impl states::minigame::Minigame for MGCastleClimb {
                 / 2.0
                 * y;
             let mut x = 1.0 * MGCastleClimb::HORIZ_VEL * t + MGCastleClimb::BLOCK_WIDTH;
-            if x + last.x > 1.0 || (last.x - x > -1.0 && rand::thread_rng().gen_weighted_bool(2)) {
+            if x + last.x > 1.0 || (last.x - x > -1.0 && rand::thread_rng().gen::<u32>() < std::u32::MAX / 2) {
                 x = -x;
             }
             last += tputil::Point2D::new(x, y);

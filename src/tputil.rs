@@ -101,15 +101,12 @@ pub enum InputType {
 }
 
 #[derive(PartialEq, Eq, Copy, Clone)]
-pub struct InputMethod {
-    input_type: InputType,
-    id: usize,
+pub enum InputMethod {
+    Gamepad(gilrs::GamepadId),
+    Keyboard
 }
 
-const KEYBOARD: InputMethod = InputMethod {
-    input_type: InputType::Keyboard,
-    id: 0,
-};
+const KEYBOARD: InputMethod = InputMethod::Keyboard;
 
 #[derive(Clone)]
 pub struct Player {
@@ -175,12 +172,12 @@ impl InputState {
     }
 
     pub fn get_axis(&self, ctl: &InputMethod, axis: Axis) -> f32 {
-        match ctl.input_type {
-            InputType::Gamepad => {
-                if self.backend[ctl.id].status() == gilrs::Status::Disconnected {
+        match ctl {
+            InputMethod::Gamepad(id) => {
+                if !self.backend.gamepad(*id).is_connected() {
                     0.0
                 } else {
-                    let raw = &self.backend[ctl.id];
+                    let raw = &self.backend.gamepad(*id);
                     match axis {
                         Axis::X => {
                             raw.value(gilrs::Axis::LeftStickX) + raw.value(gilrs::Axis::DPadX)
@@ -193,7 +190,7 @@ impl InputState {
                     .min(1.0)
                 }
             }
-            InputType::Keyboard => match axis {
+            InputMethod::Keyboard => match axis {
                 Axis::X => {
                     (match self.keyboard_state.get(&piston::input::Key::Left) {
                         Some(_) => -1.0,
@@ -217,9 +214,9 @@ impl InputState {
     }
 
     pub fn is_pressed(&self, ctl: &InputMethod, button: Button) -> bool {
-        match ctl.input_type {
-            InputType::Gamepad => self.backend[ctl.id].is_pressed(button),
-            InputType::Keyboard => {
+        match ctl {
+            InputMethod::Gamepad(id) => self.backend.gamepad(*id).is_pressed(button),
+            InputMethod::Keyboard => {
                 let key = match button {
                     Button::South => Some(piston::input::Key::LShift),
                     Button::Start => Some(piston::input::Key::Return),
@@ -239,12 +236,9 @@ impl InputState {
 
     pub fn get_pressed_any(&self, button: Button) -> Vec<InputMethod> {
         let mut results = Vec::new();
-        for (_id, gamepad) in self.backend.gamepads() {
+        for (id, gamepad) in self.backend.gamepads() {
             if gamepad.is_pressed(button) {
-                results.push(InputMethod {
-                    id: _id,
-                    input_type: InputType::Gamepad,
-                });
+                results.push(InputMethod::Gamepad(id))
             }
         }
         if self.is_pressed(&KEYBOARD, button) {

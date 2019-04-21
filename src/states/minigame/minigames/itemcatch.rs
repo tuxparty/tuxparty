@@ -164,14 +164,14 @@ impl states::minigame::Minigame for MGItemCatch {
             self.items.remove(index);
         }
         let chance = 1.0 * props.time;
-        if rand::thread_rng().next_f64() < chance {
+        if rand::thread_rng().gen::<f64>() < chance {
             let side = if rand::thread_rng().gen() { 1.0 } else { -1.0 };
             let start_vel = tputil::Point2D::new(
-                rand::thread_rng().next_f64().sqrt() * 2.0 * -side,
-                -rand::thread_rng().next_f64().sqrt(),
+                rand::thread_rng().gen::<f64>().sqrt() * 2.0 * -side,
+                -rand::thread_rng().gen::<f64>().sqrt(),
             );
             let start_pos =
-                tputil::Point2D::new(1.25 * side, rand::thread_rng().next_f64() * 1.5 - 1.5);
+                tputil::Point2D::new(1.25 * side, rand::thread_rng().gen::<f64>() * 1.5 - 1.5);
             let value = if rand::thread_rng().gen() { 1 } else { -1 };
 
             self.items.push(ICItem {

@@ -142,7 +142,7 @@ impl states::minigame::Minigame for MGSnake {
         if self.unhandled_time > 0.2 {
             self.unhandled_time -= 0.2;
 
-            if rand::thread_rng().gen_weighted_bool(10) {
+            if rand::thread_rng().gen::<u32>() < std::u32::MAX / 10 {
                 self.pellets.push((
                     rand::thread_rng().gen_range(0, MGSnake::GRID_SIZE),
                     rand::thread_rng().gen_range(0, MGSnake::GRID_SIZE),

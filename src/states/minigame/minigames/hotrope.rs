@@ -2,8 +2,8 @@ use crate::game;
 use crate::states;
 use crate::tputil;
 
-use rand::Rng;
 use crate::states::minigame::MinigameResult;
+use rand::Rng;
 
 pub struct MGHotRope {
     players: Vec<tputil::Player>,

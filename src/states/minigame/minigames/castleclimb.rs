@@ -2,8 +2,8 @@ use crate::game;
 use crate::states;
 use crate::tputil;
 
-use rand::Rng;
 use crate::states::minigame::MinigameResult;
+use rand::Rng;
 
 struct CCPlayer {
     player: tputil::Player,
@@ -109,7 +109,9 @@ impl states::minigame::Minigame for MGCastleClimb {
                 / 2.0
                 * y;
             let mut x = 1.0 * MGCastleClimb::HORIZ_VEL * t + MGCastleClimb::BLOCK_WIDTH;
-            if x + last.x > 1.0 || (last.x - x > -1.0 && rand::thread_rng().gen::<u32>() < std::u32::MAX / 2) {
+            if x + last.x > 1.0
+                || (last.x - x > -1.0 && rand::thread_rng().gen::<u32>() < std::u32::MAX / 2)
+            {
                 x = -x;
             }
             last += tputil::Point2D::new(x, y);

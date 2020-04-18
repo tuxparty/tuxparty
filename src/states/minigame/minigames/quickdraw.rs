@@ -2,9 +2,9 @@ use crate::game;
 use crate::states;
 use crate::tputil;
 
+use crate::states::minigame::MinigameResult;
 use graphics::Transformed;
 use rand::Rng;
-use crate::states::minigame::MinigameResult;
 
 pub struct MGQuickdraw {
     players: Vec<tputil::Player>,

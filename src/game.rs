@@ -1,5 +1,5 @@
-use graphics::Transformed;
 use crate::tputil;
+use graphics::Transformed;
 
 pub struct App {
     pub input: tputil::InputState,
@@ -41,7 +41,12 @@ pub struct UpdateProps<'a> {
 }
 
 pub trait State {
-    fn render(&self, _: &mut opengl_graphics::GlGraphics, _: graphics::math::Matrix2d, _: &NumberRenderer);
+    fn render(
+        &self,
+        _: &mut opengl_graphics::GlGraphics,
+        _: graphics::math::Matrix2d,
+        _: &NumberRenderer,
+    );
     fn update(&mut self, _: UpdateProps<'_>) -> UpdateResult;
 }
 

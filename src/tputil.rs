@@ -97,7 +97,7 @@ impl Point2D {
 #[derive(PartialEq, Eq, Copy, Clone)]
 pub enum InputMethod {
     Gamepad(gilrs::GamepadId),
-    Keyboard
+    Keyboard,
 }
 
 const KEYBOARD: InputMethod = InputMethod::Keyboard;

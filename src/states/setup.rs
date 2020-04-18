@@ -110,10 +110,7 @@ impl game::State for JoinState {
             let color;
             let mut colors: Vec<usize> = (0..tputil::COLORS.len()).collect();
             for player in &self.players {
-                if let Some(pos) = (&colors)
-                    .iter()
-                    .position(|&c| c == player.player.color)
-                {
+                if let Some(pos) = (&colors).iter().position(|&c| c == player.player.color) {
                     colors.remove(pos);
                 }
             }

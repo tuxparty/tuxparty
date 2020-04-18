@@ -3,11 +3,6 @@ use crate::game;
 use crate::states;
 use crate::tputil;
 
-use graphics;
-use opengl_graphics;
-use rand;
-use std;
-
 use graphics::Transformed;
 use rand::Rng;
 use std::f64::consts::PI;

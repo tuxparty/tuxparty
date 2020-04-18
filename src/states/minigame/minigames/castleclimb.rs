@@ -1,7 +1,3 @@
-use graphics;
-use opengl_graphics;
-use rand;
-
 use crate::game;
 use crate::states;
 use crate::tputil;

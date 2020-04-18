@@ -1,8 +1,5 @@
 use crate::board;
 use crate::game;
-use graphics;
-use opengl_graphics;
-use rand;
 use crate::states;
 use crate::tputil;
 

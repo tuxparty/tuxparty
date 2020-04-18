@@ -1,11 +1,7 @@
 mod minigames;
 
 use crate::game;
-use graphics;
-use opengl_graphics;
-use rand;
 use crate::states;
-use std;
 use crate::tputil;
 
 use graphics::Transformed;

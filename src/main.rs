@@ -3,12 +3,6 @@ mod game;
 mod states;
 mod tputil;
 
-
-use opengl_graphics;
-use piston;
-
-
-
 use piston::input::{PressEvent, ReleaseEvent, RenderEvent, UpdateEvent};
 use sdl2_window::Sdl2Window as Window;
 

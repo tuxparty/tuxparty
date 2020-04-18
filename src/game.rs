@@ -1,9 +1,4 @@
-use graphics;
-use image;
-use opengl_graphics;
-
 use graphics::Transformed;
-use std;
 use crate::tputil;
 
 pub struct App {

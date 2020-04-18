@@ -4,6 +4,7 @@ use crate::states;
 use crate::tputil;
 
 use graphics::Transformed;
+use graphics::character::CharacterCache;
 use rand::Rng;
 use std::f64::consts::PI;
 
@@ -58,7 +59,7 @@ impl GameInfo {
         trans: graphics::math::Matrix2d,
         center: tputil::Point2D,
         scale: f64,
-        number_renderer: &game::NumberRenderer,
+        utils: &mut game::Utils,
         hide: &[usize],
     ) -> graphics::math::Matrix2d {
         const COLOR1: [f32; 4] = [1.0, 0.2, 0.0, 1.0];
@@ -116,15 +117,15 @@ impl GameInfo {
             let coins = format!("{}", self.players[i].coins);
             let stars = format!("{}", self.players[i].stars);
             let size = 0.4;
-            let text_size = size / 3.0;
+            let text_size = (size / 3.0) as u32;
             let mut x = -1.0;
             let coin_text_x;
             let star_text_x;
             let mut y = -1.0;
             if i == 1 || i == 3 {
                 x = 1.0 - size;
-                coin_text_x = -number_renderer.get_str_width(&coins, text_size) + size / 3.0;
-                star_text_x = -number_renderer.get_str_width(&stars, text_size) + size / 3.0;
+                coin_text_x = -utils.font.width(text_size, &coins).unwrap() + size / 3.0;
+                star_text_x = -utils.font.width(text_size, &stars).unwrap() + size / 3.0;
             } else {
                 coin_text_x = size * 2.0 / 3.0;
                 star_text_x = size * 2.0 / 3.0;
@@ -142,16 +143,18 @@ impl GameInfo {
                 trans,
                 gl,
             );
-            number_renderer.draw_str(
+            graphics::Text::new(text_size).draw(
                 &coins,
-                text_size,
-                trans.trans(x + coin_text_x, y + text_size / 2.0),
+                &mut utils.font,
+                &Default::default(),
+                trans.trans(x + coin_text_x, y + (text_size as f64) / 2.0),
                 gl,
             );
-            number_renderer.draw_str(
+            graphics::Text::new(text_size).draw(
                 &stars,
-                text_size,
-                trans.trans(x + star_text_x, y + text_size * 1.5),
+                &mut utils.font,
+                &Default::default(),
+                trans.trans(x + star_text_x, y + (text_size as f64) * 1.5),
                 gl,
             );
         }
@@ -194,14 +197,14 @@ impl game::State for BoardMoveState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        number_renderer: &game::NumberRenderer,
+        utils: &mut game::Utils,
     ) {
         let transform = self.game.render(
             gl,
             trans,
             BOARD_CENTER,
             0.06,
-            &number_renderer,
+            utils,
             &[self.turn],
         );
         let start = self
@@ -220,10 +223,10 @@ impl game::State for BoardMoveState {
             transform,
             gl,
         );
-        number_renderer.draw_digit(
-            self.remaining as usize,
-            1.0,
-            &tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
+        graphics::Text::new(1).draw(
+            &self.remaining.to_string(),
+            &mut utils.font,
+            &Default::default(),
             transform.trans(pos.x, pos.y - 1.0),
             gl,
         );
@@ -304,14 +307,14 @@ impl game::State for SpaceResultState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        number_renderer: &game::NumberRenderer,
+        utils: &mut game::Utils,
     ) {
         let transform = self.game.render(
             gl,
             trans,
             BOARD_CENTER,
             0.06,
-            &number_renderer,
+            utils,
             &[self.turn],
         );
         let player = &self.game.players[self.turn];
@@ -407,14 +410,14 @@ impl game::State for DieRollState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        number_renderer: &game::NumberRenderer,
+        utils: &mut game::Utils,
     ) {
         let transform = self.game.render(
             gl,
             trans,
             BOARD_CENTER,
             0.06,
-            &number_renderer,
+            utils,
             &[self.turn],
         );
         let player = &self.game.players[self.turn];
@@ -436,10 +439,10 @@ impl game::State for DieRollState {
         } else {
             2.0
         };
-        number_renderer.draw_digit(
-            self.number as usize,
-            1.0,
-            &tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
+        graphics::Text::new(1).draw(
+            &self.number.to_string(),
+            &mut utils.font,
+            &Default::default(),
             transform.trans(space.pos.x, space.pos.y - off),
             gl,
         );
@@ -525,14 +528,14 @@ impl game::State for TransitionChoiceState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        number_renderer: &game::NumberRenderer,
+        utils: &mut game::Utils,
     ) {
         let transform = self.game.render(
             gl,
             trans,
             BOARD_CENTER,
             0.06,
-            &number_renderer,
+            utils,
             &[self.turn],
         );
         let player = &self.game.players[self.turn];
@@ -560,10 +563,10 @@ impl game::State for TransitionChoiceState {
             graphics::line(COLOR2, 0.2, [p1.x, p1.y, p2.x, p2.y], transform, gl);
             graphics::line(color, 0.15, [p1.x, p1.y, p2.x, p2.y], transform, gl);
         }
-        number_renderer.draw_digit(
-            self.remaining as usize,
-            1.0,
-            &tputil::Alignment(tputil::AlignmentX::Center, tputil::AlignmentY::Bottom),
+        graphics::Text::new(1).draw(
+            &self.remaining.to_string(),
+            &mut utils.font,
+            &Default::default(),
             transform.trans(space.pos.x, space.pos.y - 1.0),
             gl,
         );

@@ -18,11 +18,7 @@ fn main() {
 
     let mut gl = opengl_graphics::GlGraphics::new(gl_version);
 
-    let mut app = game::App {
-        input: tputil::InputState::new().unwrap(),
-        state: Box::new(states::setup::MenuState {}),
-        number_renderer: game::NumberRenderer::new(),
-    };
+    let mut app = game::App::new();
 
     let mut events = piston::event_loop::Events::new(piston::event_loop::EventSettings::new());
 

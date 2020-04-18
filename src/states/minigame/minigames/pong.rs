@@ -71,7 +71,7 @@ impl states::minigame::Minigame for MGPong {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        _: &game::NumberRenderer,
+        _: &mut game::Utils,
     ) {
         const COLOR1: graphics::types::Color = [0.0, 0.0, 0.0, 1.0];
         const COLOR2: graphics::types::Color = [0.7, 0.7, 0.7, 1.0];

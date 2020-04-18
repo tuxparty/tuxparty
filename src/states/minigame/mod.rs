@@ -169,11 +169,9 @@ impl game::State for MinigameResultState {
                 gl,
             );
             let number = self.result[i].to_string();
-            graphics::Text::new(scale as u32)
-                .draw(
+            utils.draw_text(
                 &number,
-                &mut utils.font,
-                &Default::default(),
+                scale,
                 trans.trans(scale - 1.0, scale * i as f64 - 1.0),
                 gl,
             );

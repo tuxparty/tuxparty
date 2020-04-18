@@ -117,15 +117,15 @@ impl GameInfo {
             let coins = format!("{}", self.players[i].coins);
             let stars = format!("{}", self.players[i].stars);
             let size = 0.4;
-            let text_size = (size / 3.0) as u32;
+            let text_size = (size / 3.0);
             let mut x = -1.0;
             let coin_text_x;
             let star_text_x;
             let mut y = -1.0;
             if i == 1 || i == 3 {
                 x = 1.0 - size;
-                coin_text_x = -utils.font.width(text_size, &coins).unwrap() + size / 3.0;
-                star_text_x = -utils.font.width(text_size, &stars).unwrap() + size / 3.0;
+                coin_text_x = -utils.text_width(&coins, text_size) + size / 3.0;
+                star_text_x = -utils.text_width(&stars, text_size) + size / 3.0;
             } else {
                 coin_text_x = size * 2.0 / 3.0;
                 star_text_x = size * 2.0 / 3.0;
@@ -143,18 +143,16 @@ impl GameInfo {
                 trans,
                 gl,
             );
-            graphics::Text::new(text_size).draw(
+            utils.draw_text(
                 &coins,
-                &mut utils.font,
-                &Default::default(),
-                trans.trans(x + coin_text_x, y + (text_size as f64) / 2.0),
+                text_size,
+                trans.trans(x + coin_text_x, y + text_size / 2.0),
                 gl,
             );
-            graphics::Text::new(text_size).draw(
+            utils.draw_text(
                 &stars,
-                &mut utils.font,
-                &Default::default(),
-                trans.trans(x + star_text_x, y + (text_size as f64) * 1.5),
+                text_size,
+                trans.trans(x + star_text_x, y + text_size * 1.5),
                 gl,
             );
         }
@@ -223,10 +221,9 @@ impl game::State for BoardMoveState {
             transform,
             gl,
         );
-        graphics::Text::new(1).draw(
+        utils.draw_text(
             &self.remaining.to_string(),
-            &mut utils.font,
-            &Default::default(),
+            1.0,
             transform.trans(pos.x, pos.y - 1.0),
             gl,
         );
@@ -439,10 +436,9 @@ impl game::State for DieRollState {
         } else {
             2.0
         };
-        graphics::Text::new(1).draw(
+        utils.draw_text(
             &self.number.to_string(),
-            &mut utils.font,
-            &Default::default(),
+            1.0,
             transform.trans(space.pos.x, space.pos.y - off),
             gl,
         );
@@ -563,10 +559,9 @@ impl game::State for TransitionChoiceState {
             graphics::line(COLOR2, 0.2, [p1.x, p1.y, p2.x, p2.y], transform, gl);
             graphics::line(color, 0.15, [p1.x, p1.y, p2.x, p2.y], transform, gl);
         }
-        graphics::Text::new(1).draw(
+        utils.draw_text(
             &self.remaining.to_string(),
-            &mut utils.font,
-            &Default::default(),
+            1.0,
             transform.trans(space.pos.x, space.pos.y - 1.0),
             gl,
         );

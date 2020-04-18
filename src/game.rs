@@ -14,7 +14,7 @@ impl App {
             state: Box::new(crate::states::setup::MenuState {}),
             utils: Utils {
                 font: load_font(font_kit::source::SystemSource::new()
-                    .select_by_postscript_name("sans")
+                    .select_best_match(&[font_kit::family_name::FamilyName::SansSerif], &Default::default())
                     .expect("Failed to load font"))
             },
         }
@@ -72,9 +72,28 @@ pub struct Utils {
     pub font: opengl_graphics::GlyphCache<'static>,
 }
 
+impl Utils {
+    pub fn draw_text(&mut self, text: &str, text_size: f64, trans: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
+        graphics::Text::new(text_size as u32)
+            .draw(
+                text,
+                &mut self.font,
+                &Default::default(),
+                trans,
+                gl,
+            ).unwrap();
+    }
+
+    pub fn text_width(&mut self, text: &str, text_size: f64) -> f64 {
+        use graphics::character::CharacterCache;
+        self.font.width(text_size as u32, text).unwrap()
+    }
+}
+
 fn load_font(handle: font_kit::handle::Handle) -> opengl_graphics::GlyphCache<'static> {
     match handle {
         font_kit::handle::Handle::Path { path, .. } => {
+            println!("{:?}", path);
             opengl_graphics::GlyphCache::new(path, (), texture::TextureSettings::new())
                 .expect("Failed to load font")
         }

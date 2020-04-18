@@ -140,12 +140,14 @@ impl Alignment {
     }
 }
 
+#[allow(unused)]
 pub enum AlignmentX {
     Left,
     Center,
     Right,
 }
 
+#[allow(unused)]
 pub enum AlignmentY {
     Top,
     Middle,
@@ -165,6 +167,7 @@ impl InputState {
         })
     }
 
+    #[allow(unused_parens)] // https://github.com/rust-lang/rust/issues/71290
     pub fn get_axis(&self, ctl: &InputMethod, axis: Axis) -> f32 {
         match ctl {
             InputMethod::Gamepad(id) => {

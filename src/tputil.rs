@@ -95,12 +95,6 @@ impl Point2D {
 }
 
 #[derive(PartialEq, Eq, Copy, Clone)]
-pub enum InputType {
-    Gamepad,
-    Keyboard,
-}
-
-#[derive(PartialEq, Eq, Copy, Clone)]
 pub enum InputMethod {
     Gamepad(gilrs::GamepadId),
     Keyboard

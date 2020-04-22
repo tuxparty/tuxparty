@@ -168,11 +168,11 @@ impl game::State for MinigameResultState {
                 trans,
                 gl,
             );
-            let number = self.result[i].to_string();
-            utils.draw_text(
-                &number,
-                scale,
-                trans.trans(scale - 1.0, scale * i as f64 - 1.0),
+            utils.draw_text_align(
+                &self.result[i].to_string(),
+                scale / 2.0,
+                tputil::Alignment::MIDDLE_LEFT,
+                trans.trans((scale * 11.0 / 12.0) - 1.0, (i as f64 + 0.5) * scale - 1.0),
                 gl,
             );
         }

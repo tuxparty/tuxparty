@@ -20,7 +20,7 @@ pub const COLORS: [[f32; 4]; 5] = [
     [0.0, 1.0, 1.0, 1.0],
 ];
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct Point2D {
     pub x: f64,
     pub y: f64,
@@ -108,10 +108,15 @@ pub struct Player {
     pub color: usize,
 }
 
+#[derive(Clone, Copy)]
 pub struct Alignment(pub AlignmentX, pub AlignmentY);
 
 impl Alignment {
     pub const TOP_LEFT: Alignment = Alignment(AlignmentX::Left, AlignmentY::Top);
+    pub const TOP_CENTER: Alignment = Alignment(AlignmentX::Center, AlignmentY::Top);
+    pub const MIDDLE_LEFT: Alignment = Alignment(AlignmentX::Left, AlignmentY::Middle);
+    pub const MIDDLE_RIGHT: Alignment = Alignment(AlignmentX::Right, AlignmentY::Middle);
+    pub const BOTTOM_CENTER: Alignment = Alignment(AlignmentX::Center, AlignmentY::Bottom);
     fn get_offset_x(&self, width: f64) -> f64 {
         match self.0 {
             AlignmentX::Left => 0.0,
@@ -119,28 +124,30 @@ impl Alignment {
             AlignmentX::Right => -width,
         }
     }
-    fn get_offset_y(&self, height: f64) -> f64 {
+    fn get_text_offset_y(&self, height: f64) -> f64 {
         match self.1 {
-            AlignmentY::Top => 0.0,
-            AlignmentY::Middle => -height / 2.0,
-            AlignmentY::Bottom => -height,
+            AlignmentY::Top => height,
+            AlignmentY::Middle => height / 2.0,
+            AlignmentY::Bottom => 0.0,
         }
     }
-    fn get_offset(&self, width: f64, height: f64) -> Point2D {
-        Point2D::new(self.get_offset_x(width), self.get_offset_y(height))
+    fn get_text_offset(&self, width: f64, height: f64) -> Point2D {
+        Point2D::new(self.get_offset_x(width), self.get_text_offset_y(height))
     }
-    pub fn align(
+    pub fn align_text(
         &self,
         matrix: graphics::math::Matrix2d,
         width: f64,
         height: f64,
     ) -> graphics::math::Matrix2d {
-        let offset = self.get_offset(width, height);
+        let offset = self.get_text_offset(width, height);
+        println!("the offset is {:?}", offset);
         matrix.trans(offset.x, offset.y)
     }
 }
 
 #[allow(unused)]
+#[derive(Clone, Copy)]
 pub enum AlignmentX {
     Left,
     Center,
@@ -148,6 +155,7 @@ pub enum AlignmentX {
 }
 
 #[allow(unused)]
+#[derive(Clone, Copy)]
 pub enum AlignmentY {
     Top,
     Middle,

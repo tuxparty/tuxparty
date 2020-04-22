@@ -103,7 +103,7 @@ impl states::minigame::Minigame for MGItemCatch {
         }
         let time_left = (MGItemCatch::TIME_LIMIT - self.time).ceil() as i8;
         let time_str = format!("{:02}", time_left);
-        utils.draw_text(&time_str, 1.0, trans.trans(-(0.3 * 5.0 / 7.0), -1.0), gl);
+        utils.draw_text_align(&time_str, 0.1, tputil::Alignment::TOP_CENTER, trans.trans(0.0, -1.0), gl);
     }
     fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult> {
         self.time += props.time;

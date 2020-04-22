@@ -13,9 +13,8 @@ impl App {
             input: tputil::InputState::new().unwrap(),
             state: Box::new(crate::states::setup::MenuState {}),
             utils: Utils {
-                font: load_font(font_kit::source::SystemSource::new()
-                    .select_best_match(&[font_kit::family_name::FamilyName::SansSerif], &Default::default())
-                    .expect("Failed to load font"))
+                font: opengl_graphics::GlyphCache::from_bytes(include_bytes!("../assets/fonts/OpenSans-Regular.ttf"), (), texture::TextureSettings::new())
+                    .expect("Failed to load font")
             },
         }
     }
@@ -74,29 +73,32 @@ pub struct Utils {
 
 impl Utils {
     pub fn draw_text(&mut self, text: &str, text_size: f64, trans: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
-        graphics::Text::new(text_size as u32)
+        let scale = graphics::math::get_scale(trans);
+        let scale = scale[0].max(scale[1]) * 576.0;
+
+        let scaled_text_size = text_size * scale;
+        let rounded_text_size = scaled_text_size.ceil();
+
+        let extra_scale = scaled_text_size / rounded_text_size;
+
+        graphics::Text::new(rounded_text_size as u32)
             .draw(
                 text,
                 &mut self.font,
                 &Default::default(),
-                trans,
+                trans.scale(1.0 / scale * extra_scale, 1.0 / scale * extra_scale),
                 gl,
             ).unwrap();
     }
 
+    pub fn draw_text_align(&mut self, text: &str, text_size: f64, align: tputil::Alignment, trans: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
+        let width = self.text_width(text, text_size);
+        self.draw_text(text, text_size, align.align_text(trans, width, text_size / 1.33), gl);
+    }
+
     pub fn text_width(&mut self, text: &str, text_size: f64) -> f64 {
         use graphics::character::CharacterCache;
-        self.font.width(text_size as u32, text).unwrap()
-    }
-}
-
-fn load_font(handle: font_kit::handle::Handle) -> opengl_graphics::GlyphCache<'static> {
-    match handle {
-        font_kit::handle::Handle::Path { path, .. } => {
-            println!("{:?}", path);
-            opengl_graphics::GlyphCache::new(path, (), texture::TextureSettings::new())
-                .expect("Failed to load font")
-        }
-        _ => panic!("Unimplemented font type")
+        let rounded = text_size.ceil();
+        self.font.width(rounded as u32, text).unwrap() * text_size / rounded * 1.33
     }
 }

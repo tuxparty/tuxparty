@@ -122,13 +122,16 @@ impl GameInfo {
             let coin_text_x;
             let star_text_x;
             let mut y = -1.0;
+            let text_align;
             if i == 1 || i == 3 {
                 x = 1.0 - size;
-                coin_text_x = -utils.text_width(&coins, text_size) + size / 3.0;
-                star_text_x = -utils.text_width(&stars, text_size) + size / 3.0;
+                coin_text_x = size / 3.0;
+                star_text_x = size / 3.0;
+                text_align = tputil::Alignment::MIDDLE_RIGHT;
             } else {
                 coin_text_x = size * 2.0 / 3.0;
                 star_text_x = size * 2.0 / 3.0;
+                text_align = tputil::Alignment::MIDDLE_LEFT;
             }
 
             if i == 2 || i == 3 {
@@ -143,16 +146,18 @@ impl GameInfo {
                 trans,
                 gl,
             );
-            utils.draw_text(
+            utils.draw_text_align(
                 &coins,
                 text_size,
-                trans.trans(x + coin_text_x, y + text_size / 2.0),
+                text_align,
+                trans.trans(x + coin_text_x, y + size / 3.0),
                 gl,
             );
-            utils.draw_text(
+            utils.draw_text_align(
                 &stars,
                 text_size,
-                trans.trans(x + star_text_x, y + text_size * 1.5),
+                text_align,
+                trans.trans(x + star_text_x, y + size / 1.5),
                 gl,
             );
         }
@@ -221,9 +226,10 @@ impl game::State for BoardMoveState {
             transform,
             gl,
         );
-        utils.draw_text(
+        utils.draw_text_align(
             &self.remaining.to_string(),
             1.0,
+            tputil::Alignment::BOTTOM_CENTER,
             transform.trans(pos.x, pos.y - 1.0),
             gl,
         );
@@ -436,9 +442,10 @@ impl game::State for DieRollState {
         } else {
             2.0
         };
-        utils.draw_text(
+        utils.draw_text_align(
             &self.number.to_string(),
             1.0,
+            tputil::Alignment::BOTTOM_CENTER,
             transform.trans(space.pos.x, space.pos.y - off),
             gl,
         );
@@ -559,9 +566,10 @@ impl game::State for TransitionChoiceState {
             graphics::line(COLOR2, 0.2, [p1.x, p1.y, p2.x, p2.y], transform, gl);
             graphics::line(color, 0.15, [p1.x, p1.y, p2.x, p2.y], transform, gl);
         }
-        utils.draw_text(
+        utils.draw_text_align(
             &self.remaining.to_string(),
             1.0,
+            tputil::Alignment::BOTTOM_CENTER,
             transform.trans(space.pos.x, space.pos.y - 1.0),
             gl,
         );

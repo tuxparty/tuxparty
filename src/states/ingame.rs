@@ -3,7 +3,6 @@ use crate::game;
 use crate::states;
 use crate::tputil;
 
-use graphics::character::CharacterCache;
 use graphics::Transformed;
 use rand::Rng;
 use std::f64::consts::PI;
@@ -117,7 +116,7 @@ impl GameInfo {
             let coins = format!("{}", self.players[i].coins);
             let stars = format!("{}", self.players[i].stars);
             let size = 0.4;
-            let text_size = (size / 3.0);
+            let text_size = size / 3.0;
             let mut x = -1.0;
             let coin_text_x;
             let star_text_x;

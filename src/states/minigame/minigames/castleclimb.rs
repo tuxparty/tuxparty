@@ -123,7 +123,7 @@ impl states::minigame::Minigame for MGCastleClimb {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        _number_renderer: &game::NumberRenderer,
+        _utils: &mut game::Utils,
     ) {
         const COLOR1: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
         for block in &self.blocks {

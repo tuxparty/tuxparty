@@ -36,7 +36,7 @@ impl states::minigame::Minigame for MGQuickdraw {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        _number_renderer: &game::NumberRenderer,
+        _utils: &mut game::Utils,
     ) {
         let buzzer_color;
         const COLOR1: graphics::types::Color = [1.0, 0.0, 0.0, 1.0];

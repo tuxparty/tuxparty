@@ -24,9 +24,9 @@ impl game::State for MinigameState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        number_renderer: &game::NumberRenderer,
+        utils: &mut game::Utils,
     ) {
-        self.minigame.render(gl, trans, number_renderer);
+        self.minigame.render(gl, trans, utils);
     }
     fn update(&mut self, props: game::UpdateProps<'_>) -> game::UpdateResult {
         let result = self.minigame.update(&props);
@@ -153,7 +153,7 @@ impl game::State for MinigameResultState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        number_renderer: &game::NumberRenderer,
+        utils: &mut game::Utils,
     ) {
         let scale = 2.0 / self.game.players.len() as f64;
         for i in 0..self.game.players.len() {
@@ -168,11 +168,11 @@ impl game::State for MinigameResultState {
                 trans,
                 gl,
             );
-            let number = self.result[i].to_string();
-            number_renderer.draw_str(
-                &number,
-                scale,
-                trans.trans(scale - 1.0, scale * i as f64 - 1.0),
+            utils.draw_text_align(
+                &self.result[i].to_string(),
+                scale / 2.0,
+                tputil::Alignment::MIDDLE_LEFT,
+                trans.trans((scale * 11.0 / 12.0) - 1.0, (i as f64 + 0.5) * scale - 1.0),
                 gl,
             );
         }
@@ -198,7 +198,7 @@ pub trait Minigame {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        number_renderer: &game::NumberRenderer,
+        utils: &mut game::Utils,
     );
     fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult>;
 }

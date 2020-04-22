@@ -4,10 +4,21 @@ use graphics::Transformed;
 pub struct App {
     pub input: tputil::InputState,
     pub state: Box<dyn State>,
-    pub number_renderer: NumberRenderer,
+    pub utils: Utils,
 }
 
 impl App {
+    pub fn new() -> Self {
+        Self {
+            input: tputil::InputState::new().unwrap(),
+            state: Box::new(crate::states::setup::MenuState {}),
+            utils: Utils {
+                font: opengl_graphics::GlyphCache::from_bytes(include_bytes!("../assets/fonts/OpenSans-Regular.ttf"), (), texture::TextureSettings::new())
+                    .expect("Failed to load font")
+            },
+        }
+    }
+
     pub fn render(&mut self, c: graphics::Context, gl: &mut opengl_graphics::GlGraphics) {
         const BGCOLOR: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
@@ -19,7 +30,7 @@ impl App {
             .transform
             .trans(f64::from(area[0]) / 2.0, f64::from(area[1]) / 2.0)
             .scale(scale, scale);
-        self.state.render(gl, transform, &self.number_renderer);
+        self.state.render(gl, transform, &mut self.utils);
     }
 
     pub fn update(&mut self, time: f64) {
@@ -45,7 +56,7 @@ pub trait State {
         &self,
         _: &mut opengl_graphics::GlGraphics,
         _: graphics::math::Matrix2d,
-        _: &NumberRenderer,
+        _: &mut Utils,
     );
     fn update(&mut self, _: UpdateProps<'_>) -> UpdateResult;
 }
@@ -56,81 +67,38 @@ pub enum UpdateResult {
     NewState(Box<dyn State>),
 }
 
-pub struct NumberRenderer {
-    glyphs: [opengl_graphics::Texture; 11],
+pub struct Utils {
+    pub font: opengl_graphics::GlyphCache<'static>,
 }
 
-macro_rules! load_number {
-    ($x:expr) => {
-        opengl_graphics::Texture::from_image(
-            &match image::load_from_memory(include_bytes!($x)).unwrap() {
-                image::DynamicImage::ImageRgba8(img) => img,
-                x => x.to_rgba(),
-            },
-            &opengl_graphics::TextureSettings::new(),
-        );
-    };
-}
+impl Utils {
+    pub fn draw_text(&mut self, text: &str, text_size: f64, trans: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
+        let scale = graphics::math::get_scale(trans);
+        let scale = scale[0].max(scale[1]) * 576.0;
 
-impl NumberRenderer {
-    pub fn new() -> Self {
-        NumberRenderer {
-            glyphs: [
-                load_number!("../assets/art/numbers/0.png"),
-                load_number!("../assets/art/numbers/1.png"),
-                load_number!("../assets/art/numbers/2.png"),
-                load_number!("../assets/art/numbers/3.png"),
-                load_number!("../assets/art/numbers/4.png"),
-                load_number!("../assets/art/numbers/5.png"),
-                load_number!("../assets/art/numbers/6.png"),
-                load_number!("../assets/art/numbers/7.png"),
-                load_number!("../assets/art/numbers/8.png"),
-                load_number!("../assets/art/numbers/9.png"),
-                load_number!("../assets/art/numbers/-.png"),
-            ],
-        }
-    }
+        let scaled_text_size = text_size * scale;
+        let rounded_text_size = scaled_text_size.ceil();
 
-    pub fn get_str_width(&self, string: &str, size: f64) -> f64 {
-        size * 5.0 * string.chars().count() as f64 / 7.0
-    }
+        let extra_scale = scaled_text_size / rounded_text_size;
 
-    pub fn draw_str(
-        &self,
-        string: &str,
-        size: f64,
-        transform: graphics::math::Matrix2d,
-        gl: &mut opengl_graphics::GlGraphics,
-    ) {
-        for (i, c) in string.char_indices() {
-            let digit_index = match c {
-                '-' => 10,
-                _ => c.to_digit(10).unwrap_or(0) as usize,
-            };
-            self.draw_digit(
-                digit_index,
-                size,
-                &tputil::Alignment::TOP_LEFT,
-                transform.trans(100.0 * i as f64 * size / 140.0, 0.0),
+        graphics::Text::new(rounded_text_size as u32)
+            .draw(
+                text,
+                &mut self.font,
+                &Default::default(),
+                trans.scale(1.0 / scale * extra_scale, 1.0 / scale * extra_scale),
                 gl,
-            );
-        }
+            ).unwrap();
     }
 
-    pub fn draw_digit(
-        &self,
-        digit_index: usize,
-        size: f64,
-        alignment: &tputil::Alignment,
-        transform: graphics::math::Matrix2d,
-        gl: &mut opengl_graphics::GlGraphics,
-    ) {
-        let digit = &self.glyphs[digit_index];
-        let scale = size / 140.0;
-        graphics::image(
-            digit,
-            alignment.align(transform.scale(scale, scale), 5.0 * 140.0 / 7.0, 140.0),
-            gl,
-        );
+    pub fn draw_text_align(&mut self, text: &str, text_size: f64, align: tputil::Alignment, trans: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
+        let width = self.text_width(text, text_size);
+        self.draw_text(text, text_size, align.align_text(trans, width, text_size / 1.33), gl);
+    }
+
+    pub fn text_width(&mut self, text: &str, text_size: f64) -> f64 {
+        use graphics::character::CharacterCache;
+        let rounded = text_size.ceil();
+        self.font.width(rounded as u32, text).unwrap() * text_size / rounded * 1.33
     }
 }

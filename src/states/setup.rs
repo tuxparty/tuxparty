@@ -13,7 +13,7 @@ impl game::State for MenuState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        _: &game::NumberRenderer,
+        _: &mut game::Utils,
     ) {
         const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         graphics::rectangle(
@@ -68,7 +68,7 @@ impl game::State for JoinState {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        _: &game::NumberRenderer,
+        _: &mut game::Utils,
     ) {
         const COLOR1: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         let count = self.players.len();

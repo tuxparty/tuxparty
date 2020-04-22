@@ -69,7 +69,7 @@ impl states::minigame::Minigame for MGItemCatch {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        number_renderer: &game::NumberRenderer,
+        utils: &mut game::Utils,
     ) {
         const COLOR1: graphics::types::Color = [0.7, 0.7, 0.7, 1.0];
         const COLOR2: graphics::types::Color = [1.0, 0.8, 0.0, 1.0];
@@ -103,7 +103,7 @@ impl states::minigame::Minigame for MGItemCatch {
         }
         let time_left = (MGItemCatch::TIME_LIMIT - self.time).ceil() as i8;
         let time_str = format!("{:02}", time_left);
-        number_renderer.draw_str(&time_str, 0.3, trans.trans(-(0.3 * 5.0 / 7.0), -1.0), gl);
+        utils.draw_text_align(&time_str, 0.1, tputil::Alignment::TOP_CENTER, trans.trans(0.0, -1.0), gl);
     }
     fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult> {
         self.time += props.time;

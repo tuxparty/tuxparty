@@ -42,7 +42,7 @@ impl states::minigame::Minigame for MGHotRope {
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
-        _number_renderer: &game::NumberRenderer,
+        _utils: &mut game::Utils,
     ) {
         let scale = 1.0 / self.players.len() as f64;
         let rope_y = 1.0 - self.rope_time;

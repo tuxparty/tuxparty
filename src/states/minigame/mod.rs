@@ -7,6 +7,29 @@ use crate::tputil;
 use graphics::Transformed;
 use rand::Rng;
 
+lazy_static::lazy_static! {
+    static ref MINIGAMES: Box<[Box<dyn Fn(Vec<tputil::Player>) -> Box<dyn Minigame> + Sync>]> = Box::new([
+            Box::new(minigames::quickdraw::MGQuickdraw::init),
+            Box::new(minigames::hotrope::MGHotRope::init),
+            Box::new(minigames::snake::MGSnake::init),
+            Box::new(minigames::castleclimb::MGCastleClimb::init),
+            Box::new(minigames::itemcatch::MGItemCatch::init),
+            Box::new(minigames::pong::MGPong::init),
+    ]);
+}
+
+pub trait Minigame {
+    fn render(
+        &self,
+        gl: &mut opengl_graphics::GlGraphics,
+        trans: graphics::math::Matrix2d,
+        utils: &mut game::Utils,
+    );
+    fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult>;
+    fn title(&self) -> &'static str;
+    fn description(&self) -> &'static str;
+}
+
 pub enum MinigameResult {
     Nothing,
     Winner(usize),
@@ -107,26 +130,8 @@ impl MinigameState {
             }
         }
     }
-    pub fn new(game: states::ingame::GameInfo) -> MinigameState {
-        let players = game
-            .players
-            .iter()
-            .cloned()
-            .map(|player| player.player)
-            .collect::<Vec<tputil::Player>>();
-        let games_list: Box<[Box<dyn Fn(Vec<tputil::Player>) -> Box<dyn Minigame>>]> = Box::new([
-            Box::new(minigames::quickdraw::MGQuickdraw::init),
-            Box::new(minigames::hotrope::MGHotRope::init),
-            Box::new(minigames::snake::MGSnake::init),
-            Box::new(minigames::castleclimb::MGCastleClimb::init),
-            Box::new(minigames::itemcatch::MGItemCatch::init),
-            Box::new(minigames::pong::MGPong::init),
-        ]);
-        MinigameState {
-            game,
-            minigame: games_list[rand::thread_rng().gen_range(0, games_list.len())](players),
-            //minigame: games_list[5](slice),
-        }
+    pub fn new(game: states::ingame::GameInfo, minigame: Box<dyn Minigame>) -> MinigameState {
+        MinigameState { game, minigame }
     }
 }
 
@@ -191,12 +196,70 @@ impl game::State for MinigameResultState {
     }
 }
 
-pub trait Minigame {
+pub struct MinigameDescriptionState {
+    game: states::ingame::GameInfo,
+    minigame: Box<dyn Minigame>,
+}
+
+impl MinigameDescriptionState {
+    pub fn new_random(game: states::ingame::GameInfo) -> MinigameDescriptionState {
+        let players: Vec<_> = game
+            .players
+            .iter()
+            .map(|player| player.player.clone())
+            .collect();
+
+        MinigameDescriptionState {
+            game,
+            minigame: MINIGAMES[rand::thread_rng().gen_range(0, MINIGAMES.len())](players),
+        }
+    }
+}
+
+impl game::State for MinigameDescriptionState {
     fn render(
         &self,
         gl: &mut opengl_graphics::GlGraphics,
         trans: graphics::math::Matrix2d,
         utils: &mut game::Utils,
-    );
-    fn update(&mut self, props: &game::UpdateProps<'_>) -> Option<MinigameResult>;
+    ) {
+        utils.draw_text_align(
+            self.minigame.title(),
+            0.15,
+            tputil::Alignment::TOP_CENTER,
+            trans.trans(0.0, -1.0),
+            gl,
+        );
+
+        utils.draw_text_align_wrap(
+            self.minigame.description(),
+            0.05,
+            tputil::Alignment::MIDDLE_CENTER,
+            1.5,
+            trans.trans(0.0, 0.0),
+            gl,
+        );
+
+        utils.draw_text_align(
+            "Press Start to begin!",
+            0.1,
+            tputil::Alignment::BOTTOM_CENTER,
+            trans.trans(0.0, 1.0),
+            gl,
+        );
+    }
+
+    fn update(&mut self, props: game::UpdateProps<'_>) -> game::UpdateResult {
+        if !props
+            .input
+            .get_pressed_any(tputil::Button::Start)
+            .is_empty()
+        {
+            crate::to_new_state!(move |prev: Self| {
+                Box::new(MinigameState::new(prev.game, prev.minigame))
+            })
+        } else {
+            game::UpdateResult::Continue
+        }
+    }
 }

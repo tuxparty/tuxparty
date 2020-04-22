@@ -146,6 +146,54 @@ impl Utils {
         );
     }
 
+    pub fn draw_text_align_wrap(
+        &mut self,
+        text: &str,
+        text_size: f64,
+        align: tputil::Alignment,
+        width: f64,
+        trans: graphics::math::Matrix2d,
+        gl: &mut opengl_graphics::GlGraphics,
+    ) {
+        let space_width = self.text_width(" ", text_size);
+
+        let mut lines = Vec::new();
+        let mut current_line: Option<(usize, usize, f64)> = None;
+        for (start, end, word) in tputil::str_split_ranges(text, ' ') {
+            if let Some(ref mut current_line) = current_line {
+                let word_width = self.text_width(word, text_size);
+                if current_line.2 + space_width + word_width > width {
+                    lines.push(((current_line.0)..(current_line.1), current_line.2));
+                    *current_line = (start, end, word_width);
+                } else {
+                    *current_line = (
+                        current_line.0,
+                        end,
+                        current_line.2 + space_width + word_width,
+                    );
+                }
+            } else {
+                current_line = Some((start, end, self.text_width(word, text_size)));
+            }
+        }
+        {
+            let last_line = current_line.unwrap();
+            lines.push(((last_line.0)..(last_line.1), last_line.2));
+        }
+
+        println!("{:?}", lines);
+
+        let text_trans = align.align_text_y(trans, text_size / 1.33);
+        for (row, (range, line_width)) in lines.into_iter().rev().enumerate() {
+            self.draw_text(
+                &text[range],
+                text_size,
+                align.align_x(text_trans.trans(0.0, -(row as f64) * text_size), line_width),
+                gl,
+            );
+        }
+    }
+
     pub fn text_width(&mut self, text: &str, text_size: f64) -> f64 {
         use graphics::character::CharacterCache;
         let rounded = text_size.ceil();

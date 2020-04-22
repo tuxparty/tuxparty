@@ -228,4 +228,10 @@ impl states::minigame::Minigame for MGSnake {
         }
         None
     }
+    fn title(&self) -> &'static str {
+        "Snake"
+    }
+    fn description(&self) -> &'static str {
+        "Use the joystick to direct your snake. Collect food to grow longer, and avoid running into walls or snakes."
+    }
 }

@@ -101,4 +101,10 @@ impl states::minigame::Minigame for MGQuickdraw {
             None
         }
     }
+    fn title(&self) -> &'static str {
+        "Quickdraw"
+    }
+    fn description(&self) -> &'static str {
+        "When the big box turns green, press A. The first player to react wins."
+    }
 }

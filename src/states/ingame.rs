@@ -328,7 +328,9 @@ impl game::State for SpaceResultState {
                 });
             } else {
                 return crate::to_new_state!(|prev: Self| {
-                    Box::new(states::minigame::MinigameState::new(prev.game))
+                    Box::new(states::minigame::MinigameDescriptionState::new_random(
+                        prev.game,
+                    ))
                 });
             }
         }

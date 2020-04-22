@@ -184,4 +184,10 @@ impl states::minigame::Minigame for MGItemCatch {
         }
         None
     }
+    fn title(&self) -> &'static str {
+        "Gold Rush"
+    }
+    fn description(&self) -> &'static str {
+        "Gold is raining down! Move left and right, and jump with A, to collect as much as you can. However, you do not want to catch the red blocks."
+    }
 }

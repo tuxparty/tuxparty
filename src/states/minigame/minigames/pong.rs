@@ -267,4 +267,10 @@ impl states::minigame::Minigame for MGPong {
             })
         }
     }
+    fn title(&self) -> &'static str {
+        "Cube Tennis"
+    }
+    fn description(&self) -> &'static str {
+        "Use the joystick to move your paddle up and down. Don't let the cube get past it."
+    }
 }

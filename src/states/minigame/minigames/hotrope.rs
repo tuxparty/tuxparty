@@ -111,4 +111,10 @@ impl states::minigame::Minigame for MGHotRope {
             Some(winner) => Some(MinigameResult::Winner(winner)),
         }
     }
+    fn title(&self) -> &'static str {
+        "Sweeper"
+    }
+    fn description(&self) -> &'static str {
+        "Press A to jump. Don't let the sweeper sweep you away!"
+    }
 }

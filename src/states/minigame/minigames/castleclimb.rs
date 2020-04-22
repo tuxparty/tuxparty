@@ -152,4 +152,10 @@ impl states::minigame::Minigame for MGCastleClimb {
             );
         }
     }
+    fn title(&self) -> &'static str {
+        "Climb"
+    }
+    fn description(&self) -> &'static str {
+        "Move left and right and press A to jump. Ascend faster than your opponents to win."
+    }
 }

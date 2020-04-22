@@ -115,6 +115,7 @@ impl Alignment {
     pub const TOP_LEFT: Alignment = Alignment(AlignmentX::Left, AlignmentY::Top);
     pub const TOP_CENTER: Alignment = Alignment(AlignmentX::Center, AlignmentY::Top);
     pub const MIDDLE_LEFT: Alignment = Alignment(AlignmentX::Left, AlignmentY::Middle);
+    pub const MIDDLE_CENTER: Alignment = Alignment(AlignmentX::Center, AlignmentY::Middle);
     pub const MIDDLE_RIGHT: Alignment = Alignment(AlignmentX::Right, AlignmentY::Middle);
     pub const BOTTOM_CENTER: Alignment = Alignment(AlignmentX::Center, AlignmentY::Bottom);
     fn get_offset_x(&self, width: f64) -> f64 {
@@ -143,6 +144,20 @@ impl Alignment {
         let offset = self.get_text_offset(width, height);
         println!("the offset is {:?}", offset);
         matrix.trans(offset.x, offset.y)
+    }
+    pub fn align_x(
+        &self,
+        matrix: graphics::math::Matrix2d,
+        width: f64,
+    ) -> graphics::math::Matrix2d {
+        matrix.trans(self.get_offset_x(width), 0.0)
+    }
+    pub fn align_text_y(
+        &self,
+        matrix: graphics::math::Matrix2d,
+        height: f64,
+    ) -> graphics::math::Matrix2d {
+        matrix.trans(0.0, self.get_text_offset_y(height))
     }
 }
 
@@ -265,5 +280,68 @@ impl InputState {
 
     pub fn on_key_release(&mut self, key: piston::input::Key) {
         self.keyboard_state.remove(&key);
+    }
+}
+
+struct SplitRangesIter<'a> {
+    text: &'a str,
+    pattern: char,
+    current_start: Option<usize>,
+    char_indices_iter: std::str::CharIndices<'a>,
+    finished: bool,
+}
+
+impl<'a> std::iter::Iterator for SplitRangesIter<'a> {
+    type Item = (usize, usize, &'a str);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.finished {
+            return None;
+        }
+
+        loop {
+            match self.char_indices_iter.next() {
+                Some((chr_idx, chr)) => {
+                    if chr == self.pattern {
+                        let start = self.current_start;
+                        self.current_start = None;
+
+                        match start {
+                            Some(start) => {
+                                return Some((start, chr_idx, &self.text[start..chr_idx]))
+                            }
+                            None => return Some((chr_idx, chr_idx, &self.text[chr_idx..chr_idx])),
+                        }
+                    } else {
+                        if self.current_start == None {
+                            self.current_start = Some(chr_idx);
+                        }
+                    }
+                }
+                None => {
+                    self.finished = true;
+                    if let Some(start) = self.current_start {
+                        return Some((start, self.text.len(), &self.text[start..]));
+                    } else {
+                        return None;
+                    }
+                }
+            }
+        }
+    }
+}
+
+pub fn str_split_ranges(
+    text: &str,
+    pattern: char,
+) -> impl std::iter::Iterator<Item = (usize, usize, &str)> {
+    let char_indices_iter = text.char_indices();
+
+    SplitRangesIter {
+        text,
+        pattern,
+        current_start: None,
+        char_indices_iter,
+        finished: false,
     }
 }

@@ -13,8 +13,12 @@ impl App {
             input: tputil::InputState::new().unwrap(),
             state: Box::new(crate::states::setup::MenuState {}),
             utils: Utils {
-                font: opengl_graphics::GlyphCache::from_bytes(include_bytes!("../assets/fonts/OpenSans-Regular.ttf"), (), texture::TextureSettings::new())
-                    .expect("Failed to load font")
+                font: opengl_graphics::GlyphCache::from_bytes(
+                    include_bytes!("../assets/fonts/OpenSans-Regular.ttf"),
+                    (),
+                    texture::TextureSettings::new(),
+                )
+                .expect("Failed to load font"),
             },
         }
     }
@@ -72,7 +76,13 @@ pub struct Utils {
 }
 
 impl Utils {
-    pub fn draw_text(&mut self, text: &str, text_size: f64, trans: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
+    pub fn draw_text(
+        &mut self,
+        text: &str,
+        text_size: f64,
+        trans: graphics::math::Matrix2d,
+        gl: &mut opengl_graphics::GlGraphics,
+    ) {
         let scale = graphics::math::get_scale(trans);
         let scale = scale[0].max(scale[1]) * 576.0;
 
@@ -88,12 +98,25 @@ impl Utils {
                 &Default::default(),
                 trans.scale(1.0 / scale * extra_scale, 1.0 / scale * extra_scale),
                 gl,
-            ).unwrap();
+            )
+            .unwrap();
     }
 
-    pub fn draw_text_align(&mut self, text: &str, text_size: f64, align: tputil::Alignment, trans: graphics::math::Matrix2d, gl: &mut opengl_graphics::GlGraphics) {
+    pub fn draw_text_align(
+        &mut self,
+        text: &str,
+        text_size: f64,
+        align: tputil::Alignment,
+        trans: graphics::math::Matrix2d,
+        gl: &mut opengl_graphics::GlGraphics,
+    ) {
         let width = self.text_width(text, text_size);
-        self.draw_text(text, text_size, align.align_text(trans, width, text_size / 1.33), gl);
+        self.draw_text(
+            text,
+            text_size,
+            align.align_text(trans, width, text_size / 1.33),
+            gl,
+        );
     }
 
     pub fn text_width(&mut self, text: &str, text_size: f64) -> f64 {

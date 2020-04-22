@@ -3,8 +3,8 @@ use crate::game;
 use crate::states;
 use crate::tputil;
 
-use graphics::Transformed;
 use graphics::character::CharacterCache;
+use graphics::Transformed;
 use rand::Rng;
 use std::f64::consts::PI;
 
@@ -202,14 +202,9 @@ impl game::State for BoardMoveState {
         trans: graphics::math::Matrix2d,
         utils: &mut game::Utils,
     ) {
-        let transform = self.game.render(
-            gl,
-            trans,
-            BOARD_CENTER,
-            0.06,
-            utils,
-            &[self.turn],
-        );
+        let transform = self
+            .game
+            .render(gl, trans, BOARD_CENTER, 0.06, utils, &[self.turn]);
         let start = self
             .game
             .map
@@ -312,14 +307,9 @@ impl game::State for SpaceResultState {
         trans: graphics::math::Matrix2d,
         utils: &mut game::Utils,
     ) {
-        let transform = self.game.render(
-            gl,
-            trans,
-            BOARD_CENTER,
-            0.06,
-            utils,
-            &[self.turn],
-        );
+        let transform = self
+            .game
+            .render(gl, trans, BOARD_CENTER, 0.06, utils, &[self.turn]);
         let player = &self.game.players[self.turn];
         let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();
@@ -415,14 +405,9 @@ impl game::State for DieRollState {
         trans: graphics::math::Matrix2d,
         utils: &mut game::Utils,
     ) {
-        let transform = self.game.render(
-            gl,
-            trans,
-            BOARD_CENTER,
-            0.06,
-            utils,
-            &[self.turn],
-        );
+        let transform = self
+            .game
+            .render(gl, trans, BOARD_CENTER, 0.06, utils, &[self.turn]);
         let player = &self.game.players[self.turn];
         let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();
@@ -533,14 +518,9 @@ impl game::State for TransitionChoiceState {
         trans: graphics::math::Matrix2d,
         utils: &mut game::Utils,
     ) {
-        let transform = self.game.render(
-            gl,
-            trans,
-            BOARD_CENTER,
-            0.06,
-            utils,
-            &[self.turn],
-        );
+        let transform = self
+            .game
+            .render(gl, trans, BOARD_CENTER, 0.06, utils, &[self.turn]);
         let player = &self.game.players[self.turn];
         let color = tputil::COLORS[player.player.color];
         let space = self.game.map.get_space(player.space).unwrap();

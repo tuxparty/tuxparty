@@ -7,8 +7,10 @@ use crate::tputil;
 use graphics::Transformed;
 use rand::Rng;
 
+type MinigameFactory = dyn Fn(Vec<tputil::Player>) -> Box<dyn Minigame> + Sync;
+
 lazy_static::lazy_static! {
-    static ref MINIGAMES: Box<[Box<dyn Fn(Vec<tputil::Player>) -> Box<dyn Minigame> + Sync>]> = Box::new([
+    static ref MINIGAMES: Box<[Box<MinigameFactory>]> = Box::new([
             Box::new(minigames::quickdraw::MGQuickdraw::init),
             Box::new(minigames::hotrope::MGHotRope::init),
             Box::new(minigames::snake::MGSnake::init),

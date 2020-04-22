@@ -1,8 +1,4 @@
-use gilrs;
 pub use gilrs::Button;
-use graphics;
-use piston;
-use std;
 
 use graphics::Transformed;
 

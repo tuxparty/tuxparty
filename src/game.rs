@@ -53,7 +53,12 @@ impl App {
                         unreachable!()
                     }
 
-                    fn render(&self, _: &mut opengl_graphics::GlGraphics, _: graphics::math::Matrix2d, _: &mut Utils) {
+                    fn render(
+                        &self,
+                        _: &mut opengl_graphics::GlGraphics,
+                        _: graphics::math::Matrix2d,
+                        _: &mut Utils,
+                    ) {
                         unreachable!()
                     }
                 }

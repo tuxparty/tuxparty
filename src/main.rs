@@ -52,5 +52,5 @@ macro_rules! to_new_state {
                 Err(_) => unreachable!(),
             }
         }))
-    }}
+    }};
 }

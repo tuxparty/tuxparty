@@ -324,10 +324,7 @@ impl game::State for SpaceResultState {
         if self.time > 1.0 {
             if self.turn + 1 < self.game.players.len() {
                 return crate::to_new_state!(|prev: Self| {
-                    Box::new(DieRollState::new(
-                            prev.game,
-                            prev.turn + 1,
-                        ))
+                    Box::new(DieRollState::new(prev.game, prev.turn + 1))
                 });
             } else {
                 return crate::to_new_state!(|prev: Self| {
@@ -373,17 +370,14 @@ impl game::State for DieRollState {
                 if space.transitions.len() > 1 {
                     return crate::to_new_state!(|prev: Self| {
                         Box::new(TransitionChoiceState::new(
-                                prev.game,
-                                prev.turn,
-                                prev.number))
+                            prev.game,
+                            prev.turn,
+                            prev.number,
+                        ))
                     });
                 } else {
                     return crate::to_new_state!(|prev: Self| {
-                        Box::new(BoardMoveState::new(
-                                prev.game,
-                                0,
-                                prev.turn,
-                                prev.number))
+                        Box::new(BoardMoveState::new(prev.game, 0, prev.turn, prev.number))
                     });
                 }
             }
@@ -470,10 +464,11 @@ impl game::State for TransitionChoiceState {
         ) {
             crate::to_new_state!(|prev: Self| {
                 Box::new(BoardMoveState::new(
-                        prev.game,
-                        prev.selected,
-                        prev.turn,
-                        prev.remaining))
+                    prev.game,
+                    prev.selected,
+                    prev.turn,
+                    prev.remaining,
+                ))
             })
         } else {
             let input_x = props

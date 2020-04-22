@@ -35,10 +35,7 @@ impl game::State for MinigameState {
             let processed = self.process_result(result);
 
             crate::to_new_state!(move |prev: Self| {
-                Box::new(MinigameResultState::new(
-                        prev.game,
-                        processed,
-                        ))
+                Box::new(MinigameResultState::new(prev.game, processed))
             })
         } else {
             game::UpdateResult::Continue

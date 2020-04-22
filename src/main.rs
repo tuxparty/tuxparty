@@ -42,3 +42,15 @@ fn main() {
         }
     }
 }
+
+#[macro_export]
+macro_rules! to_new_state {
+    ($e:expr) => {{
+        crate::game::UpdateResult::ToNewState(Box::new(|selfbox| {
+            match selfbox.into_any().downcast::<Self>() {
+                Ok(prev) => ($e)(*prev),
+                Err(_) => unreachable!(),
+            }
+        }))
+    }}
+}

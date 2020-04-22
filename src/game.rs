@@ -46,6 +46,25 @@ impl App {
         match result {
             UpdateResult::Continue => {}
             UpdateResult::NewState(new_state) => self.state = new_state,
+            UpdateResult::ToNewState(f) => {
+                struct UnreachableState;
+                impl State for UnreachableState {
+                    fn update(&mut self, _: UpdateProps<'_>) -> UpdateResult {
+                        unreachable!()
+                    }
+
+                    fn render(&self, _: &mut opengl_graphics::GlGraphics, _: graphics::math::Matrix2d, _: &mut Utils) {
+                        unreachable!()
+                    }
+                }
+
+                let mut tmp: Box<dyn State + 'static> = Box::new(UnreachableState);
+                std::mem::swap(&mut self.state, &mut tmp);
+
+                let old_state = tmp;
+                let new_state = f(old_state);
+                self.state = new_state;
+            }
         }
     }
 }
@@ -55,7 +74,7 @@ pub struct UpdateProps<'a> {
     pub time: f64,
 }
 
-pub trait State {
+pub trait State: downcast_rs::Downcast {
     fn render(
         &self,
         _: &mut opengl_graphics::GlGraphics,
@@ -65,10 +84,13 @@ pub trait State {
     fn update(&mut self, _: UpdateProps<'_>) -> UpdateResult;
 }
 
+downcast_rs::impl_downcast!(State);
+
 #[must_use]
 pub enum UpdateResult {
     Continue,
     NewState(Box<dyn State>),
+    ToNewState(Box<dyn FnOnce(Box<dyn State>) -> Box<dyn State>>),
 }
 
 pub struct Utils {

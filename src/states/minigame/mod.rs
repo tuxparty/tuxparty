@@ -32,16 +32,17 @@ impl game::State for MinigameState {
         let result = self.minigame.update(&props);
         if let Some(result) = result {
             println!("returned from minigame");
-            let new_game_state = self.game.clone();
             let processed = self.process_result(result);
 
-            return game::UpdateResult::NewState(Box::new(MinigameResultState::new(
-                new_game_state,
-                processed,
-            )));
+            crate::to_new_state!(move |prev: Self| {
+                Box::new(MinigameResultState::new(
+                        prev.game,
+                        processed,
+                        ))
+            })
+        } else {
+            game::UpdateResult::Continue
         }
-
-        game::UpdateResult::Continue
     }
 }
 

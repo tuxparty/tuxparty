@@ -324,14 +324,16 @@ impl game::State for SpaceResultState {
         self.time += props.time;
         if self.time > 1.0 {
             if self.turn + 1 < self.game.players.len() {
-                return game::UpdateResult::NewState(Box::new(DieRollState::new(
-                    self.game.clone(),
-                    self.turn + 1,
-                )));
+                return crate::to_new_state!(|prev: Self| {
+                    Box::new(DieRollState::new(
+                            prev.game,
+                            prev.turn + 1,
+                        ))
+                });
             } else {
-                return game::UpdateResult::NewState(Box::new(
-                    states::minigame::MinigameState::new(self.game.clone()),
-                ));
+                return crate::to_new_state!(|prev: Self| {
+                    Box::new(states::minigame::MinigameState::new(prev.game))
+                });
             }
         }
 
@@ -370,18 +372,20 @@ impl game::State for DieRollState {
                     .get_space(self.game.players[self.turn].space)
                     .unwrap();
                 if space.transitions.len() > 1 {
-                    return game::UpdateResult::NewState(Box::new(TransitionChoiceState::new(
-                        self.game.clone(),
-                        self.turn,
-                        self.number,
-                    )));
+                    return crate::to_new_state!(|prev: Self| {
+                        Box::new(TransitionChoiceState::new(
+                                prev.game,
+                                prev.turn,
+                                prev.number))
+                    });
                 } else {
-                    return game::UpdateResult::NewState(Box::new(BoardMoveState::new(
-                        self.game.clone(),
-                        0,
-                        self.turn,
-                        self.number,
-                    )));
+                    return crate::to_new_state!(|prev: Self| {
+                        Box::new(BoardMoveState::new(
+                                prev.game,
+                                0,
+                                prev.turn,
+                                prev.number))
+                    });
                 }
             }
         } else if props.input.is_pressed(
@@ -465,12 +469,13 @@ impl game::State for TransitionChoiceState {
             &self.game.players[self.turn].player.input,
             tputil::Button::South,
         ) {
-            game::UpdateResult::NewState(Box::new(BoardMoveState::new(
-                self.game.clone(),
-                self.selected,
-                self.turn,
-                self.remaining,
-            )))
+            crate::to_new_state!(|prev: Self| {
+                Box::new(BoardMoveState::new(
+                        prev.game,
+                        prev.selected,
+                        prev.turn,
+                        prev.remaining))
+            })
         } else {
             let input_x = props
                 .input
